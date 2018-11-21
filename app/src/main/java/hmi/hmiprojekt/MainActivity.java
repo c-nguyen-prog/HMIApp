@@ -20,4 +20,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    //TODO function of reading in Trips implemented test it out on phone. Then commit and push it.
+    //TODO get permission to access storage
 }
