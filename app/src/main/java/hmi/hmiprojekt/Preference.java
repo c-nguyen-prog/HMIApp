@@ -10,7 +10,7 @@ public class Preference {
 
     int PRIVATE_MODE = 0;
 
-    private static final String PREF_NAME = "multitouch-competition";
+    private static final String PREF_NAME = "hmi-project";
     private static final String IS_FIRST_TIME = "IsFirstTime";
 
     public Preference(Context context) {
