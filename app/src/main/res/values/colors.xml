@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#E64A19</color>
+    <color name="colorPrimaryDark">#5D4037</color>
+    <color name="colorAccent">#4CAF50</color>
+
+    <color name="linkColor">#0000ff</color>
+    <color name="background_main">#FBE9E7</color>
+
+    <!-- Screens background color-->
+    <color name="bg_screen1">#226666</color>
+    <color name="bg_screen2">#aa3939</color>
+    <color name="bg_screen3">#71266e</color>
+    <!-- dots inactive colors -->
+    <color name="pager_dark_screen1">#153c3c</color>
+    <color name="pager_dark_screen2">#632222</color>
+    <color name="pager_dark_screen3">#531c51</color>
+    <!-- dots active colors -->
+    <color name="pager_light_screen1">#2e9090</color>
+    <color name="pager_light_screen2">#f14d4d</color>
+    <color name="pager_light_screen3">#8f2f8b</color>
+    <array name="array_pager_active">
+        <item>@color/pager_light_screen1</item>
+        <item>@color/pager_light_screen2</item>
+        <item>@color/pager_light_screen3</item>
+    </array>
+    <array name="array_pager_inactive">
+        <item>@color/pager_dark_screen1</item>
+        <item>@color/pager_dark_screen2</item>
+        <item>@color/pager_dark_screen3</item>
+    </array>
 </resources>
