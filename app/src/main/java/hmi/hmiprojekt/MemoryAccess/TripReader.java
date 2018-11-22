@@ -15,13 +15,13 @@ public class TripReader {
         Trip[] trips = new Trip[dirs.size()];
         // creates Trip object out of each dir
         for(int i = 0; i < trips.length; i++) {
-            trips[0] = readTrip(dirs.get(0));
+            trips[i] = readTrip(dirs.get(i));
         }
         return trips;
     }
 
-    public static Trip readTrip(File tripDir) throws ParseException {
-        String[] tmp = tripDir.getName().split("__");
+    private static Trip readTrip(File tripDir) throws ParseException {
+        String[] tmp = tripDir.getName().split("_");
         Date start = Config.tripdf.parse(tmp[0]);
         return new Trip(tmp[1], start, tripDir);
     }
