@@ -1,4 +1,4 @@
-package hmi.hmiprojekt;
+package hmi.hmiprojekt.Welcome;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +17,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import hmi.hmiprojekt.MainActivity;
+import hmi.hmiprojekt.R;
 
 public class Welcome extends AppCompatActivity {
     private ViewPager viewPager;

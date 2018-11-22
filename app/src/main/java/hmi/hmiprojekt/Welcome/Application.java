@@ -1,4 +1,4 @@
-package hmi.hmiprojekt;
+package hmi.hmiprojekt.Welcome;
 
 public class Application extends android.app.Application {
     private Preference preference;

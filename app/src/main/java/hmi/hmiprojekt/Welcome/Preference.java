@@ -1,4 +1,4 @@
-package hmi.hmiprojekt;
+package hmi.hmiprojekt.Welcome;
 
 import android.content.Context;
 import android.content.SharedPreferences;
