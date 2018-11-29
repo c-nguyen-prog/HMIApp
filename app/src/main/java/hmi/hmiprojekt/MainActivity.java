@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private LocationHelper locationHelper;
-    private LatLng startPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,27 +82,9 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     private void createTrip() {
         locationHelper.startLocationRequest(this);
-
-
-        if (startPosition != null) {
-            Intent intent = new Intent(MainActivity.this, RecordTripActivity.class);
-            intent.putExtra("startPosition", startPosition);
-            startActivity(intent);
-        } else {
-            Toast.makeText(getBaseContext()
-                    , "Position error pls try again"
-                    , Toast.LENGTH_SHORT).show();
-        }
     }
 
     protected void checkLocationSetting() {
-        //TODO SIMPLIFY THIS
-        /*
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        */
 
         LocationSettingsRequest settingsRequest = new LocationSettingsRequest.Builder()
                 .addLocationRequest(new LocationRequest())
@@ -161,9 +142,15 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     @Override
     public void onSuccess(Location location) {
-        // Got last known location. In some rare situations this can be null.
+
         if (location != null) {
-            startPosition = new LatLng( location.getLatitude(), location.getLongitude());
+            Intent intent = new Intent(MainActivity.this, RecordTripActivity.class);
+            intent.putExtra("startPosition", new LatLng( location.getLatitude(), location.getLongitude()));
+            startActivity(intent);
+        } else {
+            Toast.makeText(getBaseContext()
+                    , "Position error pls try again"
+                    , Toast.LENGTH_SHORT).show();
         }
     }
 

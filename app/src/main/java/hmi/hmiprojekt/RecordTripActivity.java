@@ -1,9 +1,12 @@
 package hmi.hmiprojekt;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -11,7 +14,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,7 +44,6 @@ public class RecordTripActivity extends FragmentActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationHelper = new LocationHelper(this);
-        locationHelper.startLocationRequest(RecordTripActivity.this);
         startPosition = getIntent().getParcelableExtra("startPosition");
         mQueue = Volley.newRequestQueue(this);
 
@@ -52,15 +53,6 @@ public class RecordTripActivity extends FragmentActivity implements OnMapReadyCa
             @Override
             public void onClick(View view) {
                 locationHelper.startLocationRequest(RecordTripActivity.this);
-
-                if(currentPosition != null){
-                    mMap.addMarker(new MarkerOptions().position(currentPosition).title("Waypoint"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
-                    addPolyline();
-
-                    startPosition = currentPosition;
-                    currentPosition = null;
-                }
             }
         });
 
@@ -98,7 +90,8 @@ public class RecordTripActivity extends FragmentActivity implements OnMapReadyCa
                     String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
 
                     List<LatLng> decodedPath = PolyUtil.decode(points);
-                    mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(R.color.colorPrimary));
+                    //TODO R.color.colorPrimary not working??
+                    mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -115,6 +108,21 @@ public class RecordTripActivity extends FragmentActivity implements OnMapReadyCa
 
     @Override
     public void onSuccess(Location location) {
-        currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+
+        if(location != null){
+            currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+
+            //line
+            mMap.addMarker(new MarkerOptions().position(currentPosition).title("Waypoint"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
+            addPolyline();
+
+            startPosition = currentPosition;
+            currentPosition = null;
+        } else {
+            Toast.makeText(getBaseContext()
+                , "Position error pls try again"
+                , Toast.LENGTH_SHORT).show();
+    }
     }
 }
