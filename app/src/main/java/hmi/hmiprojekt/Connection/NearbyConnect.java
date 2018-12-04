@@ -17,19 +17,24 @@ import com.google.android.gms.nearby.connection.Strategy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Random;
 
 public class NearbyConnect {
     private ConnectionsClient connectionsClient;
+    private String endpoint;
+    private String codeName;
+    private File file;
 
     public NearbyConnect(ConnectionsClient connectionsClient){
         this.connectionsClient = connectionsClient;
+        Random r = new Random();
+        codeName = Integer.toString(r.nextInt(1000 - 1));
     }
 
-    private void startAdvertising() {
+    private void startAdvertisingHere() {
         AdvertisingOptions advertisingOptions =
                 new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
-        connectionsClient.startAdvertising(
-                        getUserNickname(), "hmi.hmiprojekt", connectionLifecycleCallback, advertisingOptions)
+        connectionsClient.startAdvertising(codeName, "hmi.hmiprojekt", connectionLifecycleCallback, advertisingOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
                             // We're advertising!
@@ -40,7 +45,7 @@ public class NearbyConnect {
                         });
     }
 
-    private void startDiscovery() {
+    private void startDiscoveryHere() {
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
         connectionsClient.startDiscovery("hmi.hmiprojekt", endpointDiscoveryCallback, discoveryOptions)
@@ -54,19 +59,12 @@ public class NearbyConnect {
                         });
     }
 
-    private void stopAdvertising(){
-        connectionsClient.stopAdvertising();
-    }
-    private void stopDiscovery(){
-        connectionsClient.stopDiscovery();
-    }
-
     private final EndpointDiscoveryCallback endpointDiscoveryCallback =
             new EndpointDiscoveryCallback() {
                 @Override
                 public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
                     // An endpoint was found. We request a connection to it.
-                    connectionsClient.requestConnection(getUserNickname(), endpointId, connectionLifecycleCallback)
+                    connectionsClient.requestConnection(codeName, endpointId, connectionLifecycleCallback)
                             .addOnSuccessListener(
                                     (Void unused) -> {
                                         // We successfully requested a connection. Now both sides
@@ -90,13 +88,15 @@ public class NearbyConnect {
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
                     // Automatically accept the connection on both sides.
                     connectionsClient.acceptConnection(endpointId, payloadCallback);
+                    endpoint=connectionInfo.getEndpointName();
                 }
 
                 @Override
                 public void onConnectionResult(String endpointId, ConnectionResolution result) {
                     switch (result.getStatus().getStatusCode()) {
                         case ConnectionsStatusCodes.STATUS_OK:
-                            // We're connected! Can now start sending and receiving data.
+                            connectionsClient.stopDiscovery();
+                            connectionsClient.stopAdvertising();
                             break;
                         case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                             // The connection was rejected by one or both sides.
@@ -116,14 +116,6 @@ public class NearbyConnect {
                 }
             };
 
-    private void sendPayload(File file, String endpointId){
-        try{
-            Payload filePayload=Payload.fromFile(file);
-            connectionsClient.sendPayload(endpointId, filePayload);
-        } catch (FileNotFoundException e){
-
-        }
-    }
     private final PayloadCallback payloadCallback =
             new PayloadCallback() {
                 @Override
@@ -134,7 +126,41 @@ public class NearbyConnect {
 
                 @Override
                 public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
-
+                    if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
+                        connectionsClient.disconnectFromEndpoint(endpoint);
+                    }
                 }
             };
+
+    public void sender(File file){
+
+        startAdvertisingHere();
+        startDiscoveryHere();
+
+        try{
+            Payload filePayload=Payload.fromFile(file);
+            connectionsClient.sendPayload(endpoint, filePayload);
+        } catch (FileNotFoundException e){
+
+        }
+
+    }
+
+    public void receiver(){
+        startAdvertisingHere();
+        startDiscoveryHere();
+    }
 }
+/*
+
+
+  public void sender(){
+    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this);
+    connectionsClient.sender(File file);
+  }
+
+  public void receiver(){
+    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this);
+    connectionsClient.receiver();
+  }
+ */
