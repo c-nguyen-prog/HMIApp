@@ -29,12 +29,15 @@ import com.google.android.gms.tasks.Task;
 
 import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
+import hmi.hmiprojekt.MemoryAccess.TripWriter;
 import hmi.hmiprojekt.TripComponents.Trip;
 
-public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>{
+public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>
+        , NewTripDialog.NewTripDialogListener {
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private LocationHelper locationHelper;
+    private Trip newTrip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +45,13 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
 
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+
         findViewById(R.id.mainFab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                createTrip();
                 checkLocationSetting();
             }
         });
@@ -80,8 +87,15 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         tripAdapter.notifyDataSetChanged();
     }
 
+    // creates a new Trip and writes it, if "ok" is pressed
     private void createTrip() {
+        showNewTripDialog();
         locationHelper.startLocationRequest(this);
+    }
+
+    private void showNewTripDialog() {
+        NewTripDialog tripDialog = new NewTripDialog();
+        tripDialog.show(getSupportFragmentManager(), "new trip dialog");
     }
 
     protected void checkLocationSetting() {
@@ -154,4 +168,16 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    // gets tripName from NewTripDialog
+    @Override
+    public void writeTripDir(String tripName) {
+        if (tripName != null && tripName.length() >= 1) {
+            try {
+                newTrip = new Trip(tripName);
+                TripWriter.createTripDir(newTrip);
+            } catch (Exception e) {
+                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
