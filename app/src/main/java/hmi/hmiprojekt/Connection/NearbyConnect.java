@@ -23,7 +23,6 @@ public class NearbyConnect {
     private ConnectionsClient connectionsClient;
     private String endpoint;
     private String codeName;
-    private File file;
 
     public NearbyConnect(ConnectionsClient connectionsClient){
         this.connectionsClient = connectionsClient;
@@ -143,7 +142,6 @@ public class NearbyConnect {
         } catch (FileNotFoundException e){
 
         }
-
     }
 
     public void receiver(){
@@ -153,14 +151,13 @@ public class NearbyConnect {
 }
 /*
 
-
-  public void sender(){
-    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this);
-    connectionsClient.sender(File file);
+  public void sendFile(File file){
+    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
+    connectionsClient.sender(file);
   }
 
-  public void receiver(){
-    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this);
+  public void receiveFile(){
+    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
     connectionsClient.receiver();
   }
  */
