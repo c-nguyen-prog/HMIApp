@@ -1,7 +1,5 @@
 package hmi.hmiprojekt.MemoryAccess;
 
-import android.widget.Toast;
-
 import java.io.File;
 
 import hmi.hmiprojekt.TripComponents.Trip;

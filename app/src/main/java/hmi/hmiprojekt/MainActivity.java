@@ -2,18 +2,17 @@ package hmi.hmiprojekt;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -29,15 +28,16 @@ import com.google.android.gms.tasks.Task;
 
 import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
-import hmi.hmiprojekt.MemoryAccess.TripWriter;
 import hmi.hmiprojekt.TripComponents.Trip;
 
 public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>
         , NewTripDialog.NewTripDialogListener {
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
+    private final static int PERMISSION_REQUEST_LOCATION = 200;
+    private final static int PERMISSION_WRITE_EXTERNAL_STORAGE = 300;
     private LocationHelper locationHelper;
-    private Trip newTrip;
+    private String tripName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +45,23 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
 
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
-
         findViewById(R.id.mainFab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createTrip();
-                checkLocationSetting();
+                showNewTripDialog();
             }
         });
+    }
 
-        initRecycler();
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
+        } else {
+            initRecycler();
+        }
     }
 
     private void initRecycler() {
@@ -66,9 +70,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         mainRecycler.setLayoutManager(
                 new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         mainRecycler.setHasFixedSize(true); // always size matching constraint
-
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
 
         // read in the trips that are going to be showed on RecyclerView
         Trip[] trips = new Trip[0];
@@ -87,9 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         tripAdapter.notifyDataSetChanged();
     }
 
-    // creates a new Trip and writes it, if "ok" is pressed
-    private void createTrip() {
-        showNewTripDialog();
+    private void startTrip() {
         locationHelper.startLocationRequest(this);
     }
 
@@ -111,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                 // All location settings are satisfied.
-                createTrip();
+                startTrip();
             }
         });
 
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        createTrip();
+                        startTrip();
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
@@ -155,11 +154,32 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_LOCATION: {
+                locationHelper.handlePermissionRequestResult(this, grantResults);
+            }
+            case PERMISSION_WRITE_EXTERNAL_STORAGE: {
+                if(grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    initRecycler();
+                } else {
+                    Toast.makeText(getBaseContext()
+                            , "Unable to read your data"
+                            , Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    @Override
     public void onSuccess(Location location) {
 
         if (location != null) {
+
             Intent intent = new Intent(MainActivity.this, RecordTripActivity.class);
             intent.putExtra("startPosition", new LatLng( location.getLatitude(), location.getLongitude()));
+            intent.putExtra("tripName", tripName);
             startActivity(intent);
         } else {
             Toast.makeText(getBaseContext()
@@ -170,14 +190,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     // gets tripName from NewTripDialog
     @Override
-    public void writeTripDir(String tripName) {
+    public void returnTripName (String tripName) {
         if (tripName != null && tripName.length() >= 1) {
-            try {
-                newTrip = new Trip(tripName);
-                TripWriter.createTripDir(newTrip);
-            } catch (Exception e) {
-                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            this.tripName = tripName;
+            checkLocationSetting();
         }
     }
 }

@@ -4,7 +4,11 @@ import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -30,8 +34,10 @@ import org.json.JSONObject;
 import java.util.List;
 
 import hmi.hmiprojekt.Location.LocationHelper;
+import hmi.hmiprojekt.MemoryAccess.TripWriter;
+import hmi.hmiprojekt.TripComponents.Trip;
 
-public class RecordTripActivity extends FragmentActivity implements OnMapReadyCallback, OnSuccessListener<Location> {
+public class RecordTripActivity extends AppCompatActivity implements OnMapReadyCallback, OnSuccessListener<Location> {
 
     private GoogleMap mMap;
     LocationHelper locationHelper;
@@ -39,12 +45,15 @@ public class RecordTripActivity extends FragmentActivity implements OnMapReadyCa
     LatLng startPosition;
     LatLng currentPosition;
     private RequestQueue mQueue;
+    private Trip mTrip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationHelper = new LocationHelper(this);
         startPosition = getIntent().getParcelableExtra("startPosition");
+        mTrip = new Trip(getIntent().getStringExtra("tripName"));
+        setTitle(getIntent().getStringExtra("tripName"));
         mQueue = Volley.newRequestQueue(this);
 
         setContentView(R.layout.activity_record_trip);
@@ -123,6 +132,27 @@ public class RecordTripActivity extends FragmentActivity implements OnMapReadyCa
             Toast.makeText(getBaseContext()
                 , "Position error pls try again"
                 , Toast.LENGTH_SHORT).show();
+        }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.save_trip_menu, menu);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // TODO snackbar
+    }
+
+    public void onSaveTrip(MenuItem item) {
+        try {
+            TripWriter.createTripDir(mTrip);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finishAfterTransition();
     }
 }

@@ -13,4 +13,5 @@
     <string name="slide_3_title">Title 3</string>
     <string name="slide_3_desc">Enjoy your trip!</string>
     <string name="name">Name</string>
+    <string name="save_trip">save trip</string>
 </resources>

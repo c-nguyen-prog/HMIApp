@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 public class LocationHelper {
 
+    private final static int PERMISSION_REQUEST_LOCATION = 200;
     private FusedLocationProviderClient mFusedLocationClient;
     private OnSuccessListener<Location> locationOnSuccessListener;
 
@@ -32,9 +33,22 @@ public class LocationHelper {
 
     public void startLocationRequest(Activity activity){
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_LOCATION);
         } else {
             requestLocation(activity);
+        }
+    }
+
+    public void handlePermissionRequestResult(Activity activity, int[] grantResults){
+        // If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // permission was granted, yay! Do the
+            // contacts-related task you need to do.
+            requestLocation(activity);
+        } else {
+            // permission denied, boo!
+            // TODO inform user
         }
     }
 

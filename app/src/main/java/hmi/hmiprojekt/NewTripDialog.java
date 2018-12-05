@@ -52,7 +52,7 @@ public class NewTripDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String tripName = editTextTripName.getText().toString();
-                        listener.writeTripDir(tripName);
+                        listener.returnTripName(tripName);
                     }
                 });
 
@@ -61,6 +61,6 @@ public class NewTripDialog extends AppCompatDialogFragment {
     }
 
     public interface NewTripDialogListener {
-        void writeTripDir(String tripName);
+        void returnTripName(String tripName);
     }
 }
