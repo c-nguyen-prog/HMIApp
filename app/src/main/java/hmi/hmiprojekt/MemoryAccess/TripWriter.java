@@ -10,6 +10,8 @@ public class TripWriter {
         File dir = generateTripDir(trip);
         if (!dir.mkdirs()) {
             throw new Exception("unable to create directory\n"+dir.getAbsolutePath());
+        } else {
+            trip.setDir(dir);
         }
     }
 

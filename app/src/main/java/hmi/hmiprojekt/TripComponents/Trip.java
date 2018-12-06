@@ -54,6 +54,10 @@ public class Trip {
         waypoints.remove(w);
     }
 
+    public void setDir(File dir) {
+        this.dir = dir;
+    }
+
     // generic getters
     public Date getStart() {
         return start;

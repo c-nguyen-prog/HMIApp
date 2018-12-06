@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         mainRecycler.setHasFixedSize(true); // always size matching constraint
 
         // read in the trips that are going to be showed on RecyclerView
+        //TODO put in own method and use it in onResume instead of init method
         Trip[] trips = new Trip[0];
         try {
             trips = TripReader.readTrips();
