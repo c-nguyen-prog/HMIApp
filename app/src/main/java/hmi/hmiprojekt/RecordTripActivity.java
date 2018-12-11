@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,19 +51,21 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     private static final int REQUEST_TAKE_PICTURE = 100;
 
     private GoogleMap mMap;
-    LocationHelper locationHelper;
-    SupportMapFragment mapFragment;
-    LatLng startPosition;
-    LatLng currentPosition;
+    private LocationHelper locationHelper;
+    private SupportMapFragment mapFragment;
+    private LatLng lastPosition;
+    private LatLng currentPosition;
     private RequestQueue mQueue;
     private Trip mTrip;
     private String pathToPicture;
+    private Marker startMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationHelper = new LocationHelper(this);
-        startPosition = getIntent().getParcelableExtra("startPosition");
+        mQueue = Volley.newRequestQueue(this);
+        currentPosition = getIntent().getParcelableExtra("currentPosition");
         mTrip = new Trip(getIntent().getStringExtra("tripName"));
 
         //create Directory so we can save images in it
@@ -73,8 +76,6 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         }
 
         setTitle(getIntent().getStringExtra("tripName"));
-        mQueue = Volley.newRequestQueue(this);
-
         setContentView(R.layout.activity_record_trip);
 
         findViewById(R.id.fabAddWaypoint).setOnClickListener(new View.OnClickListener() {
@@ -94,14 +95,19 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.addMarker(new MarkerOptions().position(startPosition).title("Start Position"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(startPosition));
+        startMarker = mMap.addMarker(new MarkerOptions().position(currentPosition));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
     }
 
     private void addPolyline(){
-        drawPolyline(
-                startPosition.latitude + "," + startPosition.longitude,
-                currentPosition.latitude + "," + currentPosition.longitude);
+        if(lastPosition != null){
+            drawPolyline(
+                    lastPosition.latitude + "," + lastPosition.longitude,
+                    currentPosition.latitude + "," + currentPosition.longitude);
+        } else {
+            //don't draw polyline after first picture and remove initial start marker
+            startMarker.remove();
+        }
     }
 
     private void drawPolyline(String origin,String destination) {
@@ -195,12 +201,12 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
             takePicture();
 
-            //line
-            mMap.addMarker(new MarkerOptions().position(currentPosition).title("Waypoint"));
+            // add marker and polyline
+            mMap.addMarker(new MarkerOptions().position(currentPosition));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
             addPolyline();
 
-            startPosition = currentPosition;
+            lastPosition = currentPosition;
         } else {
             Toast.makeText(getBaseContext()
                 , "Position error pls try again"

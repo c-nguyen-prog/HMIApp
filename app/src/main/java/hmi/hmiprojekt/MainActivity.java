@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if (location != null) {
 
             Intent intent = new Intent(MainActivity.this, RecordTripActivity.class);
-            intent.putExtra("startPosition", new LatLng( location.getLatitude(), location.getLongitude()));
+            intent.putExtra("currentPosition", new LatLng( location.getLatitude(), location.getLongitude()));
             intent.putExtra("tripName", tripName);
             startActivity(intent);
         } else {
