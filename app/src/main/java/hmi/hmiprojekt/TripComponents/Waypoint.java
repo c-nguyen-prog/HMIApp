@@ -28,19 +28,6 @@ public class Waypoint implements Comparable {
         this.longitude = longtitude;
     }
 
-    protected Waypoint(String name
-            , String desc
-            , Date timestamp
-            , long latitude
-            , long longitude) {
-        this.name = name;
-        this.desc = desc;
-        this.timestamp = timestamp;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        // TODO generate File + write
-    }
-
     // getters
     public File getImg() {
         return img;

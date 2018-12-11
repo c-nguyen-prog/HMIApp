@@ -52,6 +52,10 @@ public class Trip {
         return waypoints;
     }
 
+    public void addWaypoints() {
+
+    }
+
     public void setDir(File dir) {
         this.dir = dir;
     }

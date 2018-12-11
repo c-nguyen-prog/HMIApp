@@ -46,15 +46,13 @@ public class TripReader {
     protected static Waypoint readWaypoint(File img) throws
             ParseException
             , IOException {
-
         if (!img.exists()) throw new FileNotFoundException(img.getAbsolutePath() + "not found");
-        String[] tmp = img.getName().split("_");
-        if (tmp.length != 2) throw new RuntimeException(img.getAbsolutePath() + "not a waypoint");
 
-        Date date = Config.waypointdf.parse(tmp[0]);
-        String name = tmp[1];
+        Date date = Config.waypointdf.parse(img.getName());
+
         ExifInterface exifInterface = new ExifInterface(img.getAbsolutePath());
-        String description = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
+        String name = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
+                String description = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
         long longi = Long.parseLong(exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
         long lati = Long.parseLong(exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
 
