@@ -15,7 +15,7 @@ public class Config {
             new File(Environment.getExternalStorageDirectory() + "/roadbook/");
     // DateFormat used for saving tips
     static final DateFormat tripdf = new SimpleDateFormat("yyyyMMdd");
-    static final DateFormat waypointdf = new SimpleDateFormat("yyyyMMdd:HHmmss");
+    static final DateFormat waypointdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
 
 
     static List<File> listDirs(File dir) {

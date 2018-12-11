@@ -51,8 +51,8 @@ public class TripReader {
         Date date = Config.waypointdf.parse(img.getName());
 
         ExifInterface exifInterface = new ExifInterface(img.getAbsolutePath());
-        String name = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
-                String description = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
+        String name = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
+                String description = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
         float[] coordinates = new float[2];
         exifInterface.getLatLong(coordinates);
 
