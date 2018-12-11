@@ -11,19 +11,36 @@ import java.util.List;
 // has configuration constants and methods used for general memory access.
 public class Config {
 
-    protected static final File tripFolder =
+    static final File tripFolder =
             new File(Environment.getExternalStorageDirectory() + "/roadbook/");
     // DateFormat used for saving tips
-    protected static final DateFormat tripdf = new SimpleDateFormat("yyyyMMdd");
+    static final DateFormat tripdf = new SimpleDateFormat("yyyyMMdd");
+    static final DateFormat waypointdf = new SimpleDateFormat("yyyyMMdd:HHmmss");
 
 
-    protected static List<File> listDirs(File dir) {
+    static List<File> listDirs(File dir) {
         File[] files = dir.listFiles();
         List<File> res = new ArrayList<>();
 
-        for (File file : files) {
+        for (File file: files) {
             if (file.isDirectory()) res.add(file);
         }
         return res;
+    }
+
+
+    static List<File> listFiles(File dir) {
+        File[] files = dir.listFiles();
+        List<File> res = new ArrayList<>();
+
+        for (File file: files) {
+            if (file.isFile()) res.add(file);
+        }
+        return res;
+    }
+
+
+    public static boolean createTripFolder() {
+        return(tripFolder.mkdir());
     }
 }

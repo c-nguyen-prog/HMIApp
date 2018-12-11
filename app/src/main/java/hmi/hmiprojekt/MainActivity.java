@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import hmi.hmiprojekt.Location.LocationHelper;
+import hmi.hmiprojekt.MemoryAccess.Config;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
 import hmi.hmiprojekt.TripComponents.Trip;
 
@@ -77,9 +78,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         try {
             trips = TripReader.readTrips();
         } catch (Exception e) {
+            if (Config.createTripFolder()) {initRecycler(); return;}
             e.printStackTrace();
             Toast.makeText(getBaseContext()
-                    , "Unable to read your data"
+                    , "Unable to access your data"
                     , Toast.LENGTH_SHORT).show();
         }
 

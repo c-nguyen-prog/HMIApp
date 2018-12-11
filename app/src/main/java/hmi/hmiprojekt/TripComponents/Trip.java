@@ -1,9 +1,15 @@
 package hmi.hmiprojekt.TripComponents;
 
+import android.os.Parcelable;
+
 import java.io.File;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import hmi.hmiprojekt.MemoryAccess.Config;
+import hmi.hmiprojekt.MemoryAccess.TripReader;
 
 public class Trip {
 
@@ -12,6 +18,7 @@ public class Trip {
     private File dir;
     private List<Waypoint> waypoints;
 
+    // constructors
     public Trip(String name, Date start, File dir) {
         this.name = name;
         this.start = start;
@@ -29,29 +36,20 @@ public class Trip {
         this.start = Calendar.getInstance().getTime();
     }
 
+
     private boolean areWaypointsInitialized() {
         return waypoints != null;
     }
 
+
     private void readInWaypoints() {
-        //TODO READ WAYPOINTS
+        waypoints = TripReader.readWaypoints(this);
+        Collections.sort(waypoints);
     }
 
     public List<Waypoint> getWaypoints() {
         if (!areWaypointsInitialized()) readInWaypoints();
         return waypoints;
-    }
-
-    public void addWaypoints(List<Waypoint> waypoints) {
-        this.waypoints.addAll(waypoints);
-    }
-
-    public void addWayPoint(Waypoint w) {
-        waypoints.add(w);
-    }
-
-    public void removeWayPoint(Waypoint w) {
-        waypoints.remove(w);
     }
 
     public void setDir(File dir) {
