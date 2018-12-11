@@ -53,10 +53,10 @@ public class TripReader {
         ExifInterface exifInterface = new ExifInterface(img.getAbsolutePath());
         String name = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
                 String description = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
-        long longi = Long.parseLong(exifInterface.getAttribute(ExifInterface.TAG_GPS_LONGITUDE));
-        long lati = Long.parseLong(exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE));
+        float[] coordinates = new float[2];
+        exifInterface.getLatLong(coordinates);
 
-        return new Waypoint(img, name, description, date, longi, lati);
+        return new Waypoint(img, name, description, date, coordinates);
     }
 
     private static Trip readTrip(File tripDir) throws ParseException {
