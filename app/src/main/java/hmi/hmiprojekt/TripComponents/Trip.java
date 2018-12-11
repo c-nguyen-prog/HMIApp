@@ -36,7 +36,6 @@ public class Trip {
         this.start = Calendar.getInstance().getTime();
     }
 
-
     private boolean areWaypointsInitialized() {
         return waypoints != null;
     }
@@ -52,8 +51,8 @@ public class Trip {
         return waypoints;
     }
 
-    public void addWaypoints() {
-
+    public void notifyWaypointsChanged() {
+        readInWaypoints();
     }
 
     public void setDir(File dir) {
