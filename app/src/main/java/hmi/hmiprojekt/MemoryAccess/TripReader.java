@@ -1,12 +1,10 @@
 package hmi.hmiprojekt.MemoryAccess;
 
-import android.media.ExifInterface;
-import android.widget.Toast;
+import android.support.media.ExifInterface;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,8 +51,7 @@ public class TripReader {
         ExifInterface exifInterface = new ExifInterface(img.getAbsolutePath());
         String name = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
                 String description = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
-        float[] coordinates = new float[2];
-        exifInterface.getLatLong(coordinates);
+        double[] coordinates = exifInterface.getLatLong();
 
         return new Waypoint(img, name, description, date, coordinates);
     }

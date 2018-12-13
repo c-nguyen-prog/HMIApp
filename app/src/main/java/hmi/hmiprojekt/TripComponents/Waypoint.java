@@ -11,13 +11,13 @@ public class Waypoint implements Comparable {
     private String name;
     private String desc;
     private Date timestamp;
-    private float[] coordinates;
+    private double[] coordinates;
 
     public Waypoint(File img
             , String name
             , String desc
             , Date timestamp
-            , float[] coordinates) {
+            , double[] coordinates) {
         this.img = img;
         this.name = name;
         this.desc = desc;
@@ -42,7 +42,7 @@ public class Waypoint implements Comparable {
         return timestamp;
     }
 
-    public float[] getCoordinates() {return coordinates;}
+    public double[] getCoordinates() {return coordinates;}
 
     @Override
     public int compareTo(@NonNull Object o) {
