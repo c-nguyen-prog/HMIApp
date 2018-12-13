@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private final static int PERMISSION_WRITE_EXTERNAL_STORAGE = 300;
     private LocationHelper locationHelper;
     private String tripName;
+    private TripAdapter tripAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,21 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
         } else {
             initRecycler();
+
+            tripAdapter.setOnItemClickListener(new TripAdapter.ClickListener() {
+                @Override
+                public void onItemClick(int position, View v) {
+                    Trip clickedTrip = tripAdapter.getTrip(position);
+                    Intent intent = new Intent(MainActivity.this, ViewTripActivity.class);
+                    intent.putExtra("tripDir", clickedTrip.getDir());
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onItemLongClick(int position, View v) {
+                    //TODO make something like: open options menu to delete or share a trip maybe?
+                }
+            });
         }
     }
 
@@ -86,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
 
         // create Adapter and fill it with Trips
-        TripAdapter tripAdapter = new TripAdapter(trips);
+        tripAdapter = new TripAdapter(trips);
         mainRecycler.setAdapter(tripAdapter);
         tripAdapter.notifyDataSetChanged();
     }

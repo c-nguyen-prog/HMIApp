@@ -23,8 +23,11 @@ import com.google.maps.android.PolyUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.text.ParseException;
 import java.util.List;
 
+import hmi.hmiprojekt.MemoryAccess.TripReader;
 import hmi.hmiprojekt.TripComponents.Trip;
 import hmi.hmiprojekt.TripComponents.Waypoint;
 
@@ -33,6 +36,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
     private GoogleMap mMap;
     private RequestQueue mQueue;
     private SupportMapFragment mapFragment;
+    private Waypoint previousWaypoint;
     private Trip mTrip;
 
     @Override
@@ -41,7 +45,15 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         setContentView(R.layout.activity_view_trip);
 
         mQueue = Volley.newRequestQueue(this);
-        mTrip = getIntent().getParcelableExtra("trip");
+
+        //get tripDir vom intent and read in Trip
+        File tripDir = (File) getIntent().getSerializableExtra("tripDir");
+        try {
+            mTrip = TripReader.readTrip(tripDir);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -53,19 +65,24 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        //place all markers and draw lines between them
         for ( Waypoint waypoint : mTrip.getWaypoints() ) {
-            //mMap.addMarker(new MarkerOptions().position(waypoint.getLatLng()).title(waypoint.getName()));
+            mMap.addMarker(new MarkerOptions().position(waypoint.getLatLng()).title(waypoint.getName()));
+
+            if(previousWaypoint != null){
+                addPolyline(previousWaypoint.getLatLng(), waypoint.getLatLng());
+            }
+            previousWaypoint = waypoint;
         }
 
         // set camera over start position
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(mTrip.getWaypoints().get(0).getLatLng()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(mTrip.getWaypoints().get(0).getLatLng()));
     }
 
-    /*
-    private void addPolyline(){
+    private void addPolyline(LatLng origin, LatLng destination){
         drawPolyline(
-                lastPosition.latitude + "," + lastPosition.longitude,
-                currentPosition.latitude + "," + currentPosition.longitude);
+                origin.latitude + "," + origin.longitude,
+                destination.latitude + "," + destination.longitude);
     }
 
     private void drawPolyline(String origin,String destination) {
@@ -97,7 +114,6 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
         mQueue.add(request);
     }
-    */
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -105,5 +121,11 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         // TODO ImageView öffnen
         //return false for default behaviour
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

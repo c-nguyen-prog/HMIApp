@@ -50,13 +50,13 @@ public class TripReader {
 
         ExifInterface exifInterface = new ExifInterface(img.getAbsolutePath());
         String name = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION);
-                String description = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
+        String description = exifInterface.getAttribute(ExifInterface.TAG_USER_COMMENT);
         double[] coordinates = exifInterface.getLatLong();
 
         return new Waypoint(img, name, description, date, coordinates);
     }
 
-    private static Trip readTrip(File tripDir) throws ParseException {
+    public static Trip readTrip(File tripDir) throws ParseException {
         String[] tmp = tripDir.getName().split("_");
         Date start = Config.tripdf.parse(tmp[0]);
         return new Trip(tmp[1], start, tripDir);

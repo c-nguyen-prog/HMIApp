@@ -2,6 +2,8 @@ package hmi.hmiprojekt.TripComponents;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.File;
 import java.util.Date;
 
@@ -43,6 +45,10 @@ public class Waypoint implements Comparable {
     }
 
     public double[] getCoordinates() {return coordinates;}
+
+    public LatLng getLatLng() {
+        return new LatLng(coordinates[0], coordinates[1]);
+    }
 
     @Override
     public int compareTo(@NonNull Object o) {

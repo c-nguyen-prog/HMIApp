@@ -15,15 +15,18 @@ import hmi.hmiprojekt.TripComponents.Trip;
 public class TripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static Format dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private static ClickListener clickListener;
 
     // ViewHolder of an Object in the RecyclerView
-    public class ViewHolderTrip extends RecyclerView.ViewHolder {
+    public static class ViewHolderTrip extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
         TextView nameView;
         TextView dateView;
         // creates an empty ViewHolder
         ViewHolderTrip(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             nameView = itemView.findViewById(R.id.textView_trip_name);
             dateView = itemView.findViewById(R.id.textView_trip_date);
         }
@@ -33,6 +36,26 @@ public class TripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             nameView.setText(t.getName());
             dateView.setText(dateFormat.format(t.getStart()));
         }
+
+        @Override
+        public void onClick(View view) {
+            clickListener.onItemClick(getAdapterPosition(), view);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            clickListener.onItemLongClick(getAdapterPosition(), view);
+            return true;
+        }
+    }
+
+    public void setOnItemClickListener(ClickListener clickListener) {
+        TripAdapter.clickListener = clickListener;
+    }
+
+    public interface ClickListener {
+        void onItemClick(int position, View v);
+        void onItemLongClick(int position, View v);
     }
 
     // Array of Trips that is going to be displayed
@@ -40,6 +63,10 @@ public class TripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     TripAdapter(Trip[] trips) {
         this.trips = trips;
+    }
+
+    public Trip getTrip(int position){
+        return trips[position];
     }
 
     // called when creating a ViewHolder
