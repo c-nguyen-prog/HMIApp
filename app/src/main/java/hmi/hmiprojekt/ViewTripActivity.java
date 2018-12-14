@@ -76,7 +76,11 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         }
 
         // set camera over start position
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(mTrip.getWaypoints().get(0).getLatLng()));
+        if(mTrip.getWaypoints().size() == 0) {
+            //TODO Snackbar to inform user that he opened a trip without waypoints and close the Activity maybe?
+        } else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(mTrip.getWaypoints().get(0).getLatLng()));
+        }
     }
 
     private void addPolyline(LatLng origin, LatLng destination){
