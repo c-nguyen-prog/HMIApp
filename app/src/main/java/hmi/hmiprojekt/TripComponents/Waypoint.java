@@ -54,6 +54,9 @@ public class Waypoint implements Comparable {
     public int compareTo(@NonNull Object o) {
         if (!(o instanceof Waypoint)) return 0;
         Waypoint w = (Waypoint) o;
-        return w.getTimestamp().compareTo(timestamp);
+        int tmp = w.getTimestamp().compareTo(timestamp);
+        if (tmp > 0) return -1;
+        else if (tmp < 0) return 1;
+        return tmp;
     }
 }
