@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -96,7 +97,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         mMap = googleMap;
 
         startMarker = mMap.addMarker(new MarkerOptions().position(currentPosition));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(currentPosition).zoom(15f).build()));
     }
 
     private void addPolyline(){
@@ -203,7 +204,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
             // add marker and polyline
             mMap.addMarker(new MarkerOptions().position(currentPosition));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(currentPosition));
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(currentPosition).zoom(15f).build()));
             addPolyline();
 
             lastPosition = currentPosition;

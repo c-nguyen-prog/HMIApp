@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -79,7 +80,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         if(mTrip.getWaypoints().size() == 0) {
             //TODO Snackbar to inform user that he opened a trip without waypoints and close the Activity maybe?
         } else {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(mTrip.getWaypoints().get(0).getLatLng()));
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(mTrip.getWaypoints().get(0).getLatLng()).zoom(15f).build()));
         }
     }
 
