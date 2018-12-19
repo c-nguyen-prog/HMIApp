@@ -1,5 +1,6 @@
 package hmi.hmiprojekt;
 
+import android.util.Log;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -64,10 +65,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         setContentView(R.layout.activity_main);
         FloatingActionButton sendFAB = findViewById(R.id.sendFAB);
 
-        //Get preference and checks if it's the first time MainActivity is loaded, if yes->showcase
-        preference = Application.getApp().getPreference();
-
-
         sendFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
         } else {
             initRecycler();
+            initShowcaseTutorial();
 
             tripAdapter.setOnItemClickListener(new TripAdapter.ClickListener() {
                 @Override
@@ -111,8 +109,13 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     }
 
     private void initShowcaseTutorial() {
+        //Get preference and checks if it's the first time MainActivity is loaded, if yes->showcase
+        preference = Application.getApp().getPreference();
+        Log.e("Preference REQ", Boolean.toString(preference.isMAFirstTimeLaunch()));
+
         if (preference.isMAFirstTimeLaunch()) {
             preference.setMAFirstTimeLaunch(false);
+            Log.e("Preference SET", Boolean.toString(preference.isMAFirstTimeLaunch()));
             Toast.makeText(this, "This is first time MA is loaded", Toast.LENGTH_SHORT).show();
             //DO SHOWCASE HERE
         }

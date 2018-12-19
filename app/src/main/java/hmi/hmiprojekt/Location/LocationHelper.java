@@ -16,7 +16,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class LocationHelper {
+public class    LocationHelper {
 
     private final static int PERMISSION_REQUEST_LOCATION = 200;
     private FusedLocationProviderClient mFusedLocationClient;
