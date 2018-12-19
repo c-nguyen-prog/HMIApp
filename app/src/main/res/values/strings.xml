@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HMIProjekt</string>
+    <string name="app_name">Roadbook</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="title_activity_maps">Map</string>
 

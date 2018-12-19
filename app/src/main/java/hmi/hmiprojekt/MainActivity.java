@@ -38,6 +38,9 @@ import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.Config;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
 import hmi.hmiprojekt.TripComponents.Trip;
+import hmi.hmiprojekt.Welcome.Application;
+import hmi.hmiprojekt.Welcome.Preference;
+import hmi.hmiprojekt.Welcome.Welcome;
 
 public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>
         , NewTripDialog.NewTripDialogListener {
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private LocationHelper locationHelper;
     private String tripName;
     private TripAdapter tripAdapter;
+    private Preference preference;
+
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     WifiManager wifiManager;
     NearbyConnect connectionsClient;
@@ -59,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
         FloatingActionButton sendFAB = findViewById(R.id.sendFAB);
+
+        //Get preference and checks if it's the first time MainActivity is loaded, if yes->showcase
+        preference = Application.getApp().getPreference();
+
 
         sendFAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +108,14 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
                 }
             });
+        }
+    }
+
+    private void initShowcaseTutorial() {
+        if (preference.isMAFirstTimeLaunch()) {
+            preference.setMAFirstTimeLaunch(false);
+            Toast.makeText(this, "This is first time MA is loaded", Toast.LENGTH_SHORT).show();
+            //DO SHOWCASE HERE
         }
     }
 
