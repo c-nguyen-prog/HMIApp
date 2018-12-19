@@ -20,7 +20,10 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
+import android.widget.RelativeLayout;
+
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
@@ -116,6 +119,12 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         //Get preference and checks if it's the first time MainActivity is loaded, if yes->showcase
         preference = Application.getApp().getPreference();
         Log.e("Preference REQ", Boolean.toString(preference.isMAFirstTimeLaunch()));
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, margin);
+
         if (preference.isMAFirstTimeLaunch()) {
             preference.setMAFirstTimeLaunch(false);
             Log.e("Preference SET", Boolean.toString(preference.isMAFirstTimeLaunch()));
@@ -129,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     .setStyle(R.style.CustomShowcaseTheme2)
                     .hideOnTouchOutside()
                     .build();
+            showcase.setButtonPosition(lps);
 
         } else {
             Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
