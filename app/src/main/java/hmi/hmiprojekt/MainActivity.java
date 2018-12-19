@@ -22,6 +22,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
+
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -112,12 +116,22 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         //Get preference and checks if it's the first time MainActivity is loaded, if yes->showcase
         preference = Application.getApp().getPreference();
         Log.e("Preference REQ", Boolean.toString(preference.isMAFirstTimeLaunch()));
-
         if (preference.isMAFirstTimeLaunch()) {
             preference.setMAFirstTimeLaunch(false);
             Log.e("Preference SET", Boolean.toString(preference.isMAFirstTimeLaunch()));
             Toast.makeText(this, "This is first time MA is loaded", Toast.LENGTH_SHORT).show();
+
             //DO SHOWCASE HERE
+            ShowcaseView showcase = new ShowcaseView.Builder(this)
+                    .setTarget(new ViewTarget(R.id.mainFab, this))
+                    .setContentTitle("SHOWCASE TUTORIAL")
+                    .setContentText("CLICK HERE TO START A TRIP")
+                    .setStyle(R.style.CustomShowcaseTheme2)
+                    .hideOnTouchOutside()
+                    .build();
+
+        } else {
+            Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -311,4 +325,5 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             wifiManager.setWifiEnabled(true);
         }
     }
+
 }
