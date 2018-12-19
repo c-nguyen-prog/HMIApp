@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     WifiManager wifiManager;
     NearbyConnect connectionsClient;
-    private FloatingActionButton sendFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

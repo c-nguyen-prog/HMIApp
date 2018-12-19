@@ -1,5 +1,7 @@
 package hmi.hmiprojekt.Connection;
 
+import android.util.Log;
+
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -34,30 +36,33 @@ public class NearbyConnect {
     }
 
     private void startAdvertisingHere() {
+
         AdvertisingOptions advertisingOptions =
                 new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
         connectionsClient.startAdvertising(codeName, "hmi.hmiprojekt", connectionLifecycleCallback, advertisingOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
                             // We're advertising!
+                            Log.e("Advertising", "Advertising gestartet");
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
                             // We were unable to start advertising.
+                            Log.e("Advertising", "Advertising abgebrochen");
                         });
     }
 
     private void startDiscoveryHere() {
+        Log.e("Discovery", "Suche gestartet");
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
         connectionsClient.startDiscovery("hmi.hmiprojekt", endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
-                            // We're discovering!
+
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
-                            // We're unable to start discovering.
                         });
     }
 
@@ -66,15 +71,13 @@ public class NearbyConnect {
                 @Override
                 public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
                     // An endpoint was found. We request a connection to it.
+                    Log.e("Endpoint Found", "try connecting");
                     connectionsClient.requestConnection(codeName, endpointId, connectionLifecycleCallback)
                             .addOnSuccessListener(
                                     (Void unused) -> {
-                                        // We successfully requested a connection. Now both sides
-                                        // must accept before the connection is established.
                                     })
                             .addOnFailureListener(
                                     (Exception e) -> {
-                                        // Nearby Connections failed to request the connection.
                                     });
                 }
 
@@ -89,6 +92,7 @@ public class NearbyConnect {
                 @Override
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
                     // Automatically accept the connection on both sides.
+                    Log.e("Connection", "connection akzeptieren");
                     connectionsClient.acceptConnection(endpointId, payloadCallback);
                     endpoint=connectionInfo.getEndpointName();
                 }
@@ -97,10 +101,12 @@ public class NearbyConnect {
                 public void onConnectionResult(String endpointId, ConnectionResolution result) {
                     switch (result.getStatus().getStatusCode()) {
                         case ConnectionsStatusCodes.STATUS_OK:
+                            Log.e("ConnectionResult", "verbunden!");
                             connectionsClient.stopDiscovery();
                             connectionsClient.stopAdvertising();
                             if(fileToSend!=null) {
                                 try {
+                                    Log.e("ConnectionResult", "senden");
                                     Payload filePayload = Payload.fromFile(fileToSend);
                                     connectionsClient.sendPayload(endpoint, filePayload);
                                 } catch (FileNotFoundException e) {
@@ -110,9 +116,11 @@ public class NearbyConnect {
                             break;
                         case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                             // The connection was rejected by one or both sides.
+                            Log.e("ConnectionResult", "Verbindung wurde abgelehnt");
                             break;
                         case ConnectionsStatusCodes.STATUS_ERROR:
                             // The connection broke before it was able to be accepted.
+                            Log.e("ConnectionResult", "Verbindung wurde unterbrochen");
                             break;
                         default:
                             // Unknown status code
