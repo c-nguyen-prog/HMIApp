@@ -2,10 +2,14 @@ package hmi.hmiprojekt;
 
 import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +28,12 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import hmi.hmiprojekt.Connection.NearbyConnect;
 import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.Config;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
@@ -42,12 +48,24 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private LocationHelper locationHelper;
     private String tripName;
     private TripAdapter tripAdapter;
+    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    WifiManager wifiManager;
+    NearbyConnect connectionsClient;
+    private FloatingActionButton sendFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
+        FloatingActionButton sendFAB = findViewById(R.id.sendFAB);
+
+        sendFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recieveTrip();
+            }
+        });
 
         findViewById(R.id.mainFab).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +95,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
                 @Override
                 public void onItemLongClick(int position, View v) {
-                    //TODO make something like: open options menu to delete or share a trip maybe?
+                    sendTrip(tripAdapter.getTrip(position));
+
                 }
             });
         }
@@ -215,6 +234,62 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if (tripName != null && tripName.length() >= 1) {
             this.tripName = tripName;
             checkLocationSetting();
+        }
+    }
+
+    private void sendTrip(Trip trip){
+        if(bluetoothAdapter==null){
+            Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
+        } else {
+            connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
+            WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (!bluetoothAdapter.isEnabled()) {
+                setBluetoothAdapter();
+            }
+            try {
+                if (!wifiManager.isWifiEnabled()) {
+                    setWifi();
+                }
+            } catch (Exception e){
+                Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
+            }
+            connectionsClient.sender(trip.getDir());
+        }
+    }
+
+    private void recieveTrip(){
+        if(bluetoothAdapter==null){
+            Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
+        } else {
+            connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
+            WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (!bluetoothAdapter.isEnabled()) {
+                setBluetoothAdapter();
+            }
+            try {
+                if (!wifiManager.isWifiEnabled()) {
+                    setWifi();
+                }
+            } catch (Exception e){
+                Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
+            }
+            connectionsClient.receiver();
+        }
+    }
+
+    public void setBluetoothAdapter(){
+        if(!bluetoothAdapter.isEnabled()){
+            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1);
+            Toast.makeText(getApplicationContext(),"Bluetooth aktiv",Toast.LENGTH_SHORT).show();
+        } else {
+            bluetoothAdapter.disable();
+            Toast.makeText(getApplicationContext(),"Bluetooth inaktiv",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void setWifi(){
+        if(!wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(true);
         }
     }
 }
