@@ -19,10 +19,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Random;
 
+import hmi.hmiprojekt.MainActivity;
+
 public class NearbyConnect {
     private ConnectionsClient connectionsClient;
     private String endpoint;
     private String codeName;
+    private File fileToSend=null;
 
     public NearbyConnect(ConnectionsClient connectionsClient){
         this.connectionsClient = connectionsClient;
@@ -96,6 +99,14 @@ public class NearbyConnect {
                         case ConnectionsStatusCodes.STATUS_OK:
                             connectionsClient.stopDiscovery();
                             connectionsClient.stopAdvertising();
+                            if(fileToSend!=null) {
+                                try {
+                                    Payload filePayload = Payload.fromFile(fileToSend);
+                                    connectionsClient.sendPayload(endpoint, filePayload);
+                                } catch (FileNotFoundException e) {
+
+                                }
+                            }
                             break;
                         case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                             // The connection was rejected by one or both sides.
@@ -135,13 +146,8 @@ public class NearbyConnect {
 
         startAdvertisingHere();
         startDiscoveryHere();
+        fileToSend=file;
 
-        try{
-            Payload filePayload=Payload.fromFile(file);
-            connectionsClient.sendPayload(endpoint, filePayload);
-        } catch (FileNotFoundException e){
-
-        }
     }
 
     public void receiver(){
