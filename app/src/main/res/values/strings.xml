@@ -14,4 +14,8 @@
     <string name="slide_3_desc"></string>
     <string name="name">Name</string>
     <string name="save_trip">save trip</string>
+    <string name="speichern">speichern</string>
+    <string name="beschreibung">Beschreibung</string>
+    <string name="titel">Titel</string>
+    <string name="verwerfen">verwerfen</string>
 </resources>

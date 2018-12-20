@@ -78,8 +78,9 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
         // set camera over start position
         if(mTrip.getWaypoints().size() == 0) {
-            //TODO Snackbar to inform user that he opened a trip without waypoints and close the Activity maybe?
+            //TODO Snackbar to inform user that he opened a trip without way points and close the Activity maybe?
         } else {
+            // TODO Investigate get(0) still last waypoint?
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(mTrip.getWaypoints().get(0).getLatLng()).zoom(15f).build()));
         }
     }

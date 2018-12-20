@@ -1,5 +1,6 @@
 package hmi.hmiprojekt;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -18,8 +19,6 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,7 +34,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,29 +45,32 @@ import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.TripWriter;
 import hmi.hmiprojekt.TripComponents.Trip;
 
-public class RecordTripActivity extends AppCompatActivity implements OnMapReadyCallback, OnSuccessListener<Location> {
+public class RecordTripActivity extends AppCompatActivity implements OnMapReadyCallback, OnSuccessListener<Location>, FragmentRecordWaypoint.FragmentListener {
 
     private static final int REQUEST_TAKE_PICTURE = 100;
 
     private GoogleMap mMap;
     private LocationHelper locationHelper;
-    private SupportMapFragment mapFragment;
     private LatLng lastPosition;
     private LatLng currentPosition;
     private RequestQueue mQueue;
     private Trip mTrip;
     private String pathToPicture;
     private Marker startMarker;
+    private FragmentRecordWaypoint fragmentRecordWaypoint;
+    private Uri pictureUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fragmentRecordWaypoint = new FragmentRecordWaypoint();
         locationHelper = new LocationHelper(this);
         mQueue = Volley.newRequestQueue(this);
         currentPosition = getIntent().getParcelableExtra("currentPosition");
         mTrip = new Trip(getIntent().getStringExtra("tripName"));
 
         //create Directory so we can save images in it
+        //TODO HANDLE EXCEPTION WHERE USER WANTS SAME TRIP NAME ON SAME DAY
         try {
             TripWriter.createTripDir(mTrip);
         } catch (Exception e) {
@@ -79,15 +80,10 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         setTitle(getIntent().getStringExtra("tripName"));
         setContentView(R.layout.activity_record_trip);
 
-        findViewById(R.id.fabAddWaypoint).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                locationHelper.startLocationRequest(RecordTripActivity.this);
-            }
-        });
+        findViewById(R.id.fabAddWaypoint).setOnClickListener(view -> locationHelper.startLocationRequest(RecordTripActivity.this));
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
@@ -114,29 +110,23 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     private void drawPolyline(String origin,String destination) {
 
         String urlHead = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-        StringBuilder url = new StringBuilder();
-        url.append(urlHead).append(origin).append("&destination=").append(destination).append("&mode=walking").append("&key=").append(getString(R.string.google_maps_key));
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url.toString(), null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    // retrieve necessary information from the provided JSON
-                    String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+        //TODO change mode?
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                urlHead + origin + "&destination=" + destination + "&mode=walking"
+                        + "&key=" + getString(R.string.google_maps_key), null,
+                response -> {
+            try {
+                // retrieve necessary information from the provided JSON
+                String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
 
-                    List<LatLng> decodedPath = PolyUtil.decode(points);
-                    //TODO R.color.colorPrimary not working??
-                    mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                List<LatLng> decodedPath = PolyUtil.decode(points);
+                //TODO R.color.colorPrimary not working??
+                mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
+        }, Throwable::printStackTrace);
 
         mQueue.add(request);
     }
@@ -150,7 +140,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
             if(pictureFile != null) {
                 pathToPicture = pictureFile.getAbsolutePath();
 
-                Uri pictureUri = FileProvider.getUriForFile(this, "hmi.hmiprojekt.HMIApp.fileprovider", pictureFile);
+                pictureUri = FileProvider.getUriForFile(this, "hmi.hmiprojekt.HMIApp.fileprovider", pictureFile);
                 takePicture.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri);
                 startActivityForResult(takePicture, REQUEST_TAKE_PICTURE);
             }
@@ -159,6 +149,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private File createPictureFile() {
+        @SuppressLint("SimpleDateFormat")
         String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
         File tripDir = mTrip.getDir();
@@ -178,15 +169,16 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         if( resultCode == RESULT_OK){
             if( requestCode == REQUEST_TAKE_PICTURE){
 
-                ExifInterface exif;
-                try {
-                    exif = new ExifInterface(pathToPicture);
-                    exif.setLatLong(currentPosition.latitude, currentPosition.longitude);
-                    exif.saveAttributes();
+                fragmentRecordWaypoint.setPicture(pathToPicture);
 
-                } catch (Exception e) {
-                    Log.e("EXIF", e.getLocalizedMessage());
-                }
+                //opens fragment
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.fragment_record_waypoint_container, fragmentRecordWaypoint)
+                        .commit();
+
+                //hide FAB
+                findViewById(R.id.fabAddWaypoint).setVisibility(View.GONE);
 
             }
         }
@@ -202,12 +194,6 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
             takePicture();
 
-            // add marker and polyline
-            mMap.addMarker(new MarkerOptions().position(currentPosition));
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(currentPosition).zoom(15f).build()));
-            addPolyline();
-
-            lastPosition = currentPosition;
         } else {
             Toast.makeText(getBaseContext()
                 , "Position error pls try again"
@@ -228,6 +214,56 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     public void onSaveTrip(MenuItem item) {
+        // TODO manage saving trip without way points
         finishAfterTransition();
+    }
+
+    @Override
+    public void onSaveWaypointListener(String name, String desc) {
+        ExifInterface exif;
+        try {
+            exif = new ExifInterface(pathToPicture);
+
+            exif.setLatLong(currentPosition.latitude, currentPosition.longitude);
+            exif.setAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION, name);
+            exif.setAttribute(ExifInterface.TAG_USER_COMMENT, desc);
+            exif.saveAttributes();
+
+        } catch (Exception e) {
+            Log.e("EXIF", e.getLocalizedMessage());
+        }
+
+        // add marker and polyline when waypoint gets saved
+        mMap.addMarker(new MarkerOptions().position(currentPosition));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(currentPosition).zoom(15f).build()));
+        addPolyline();
+        lastPosition = currentPosition;
+
+        // remove fragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .remove(fragmentRecordWaypoint)
+                .commit();
+
+        //show FAB
+        findViewById(R.id.fabAddWaypoint).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDeleteWaypointListener() {
+
+        //noinspection ResultOfMethodCallIgnored
+        new File(pathToPicture).delete();
+        getContentResolver().delete(pictureUri, null, null);
+
+        // remove fragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .remove(fragmentRecordWaypoint)
+                .commit();
+
+        //show FAB
+        findViewById(R.id.fabAddWaypoint).setVisibility(View.VISIBLE);
+
     }
 }

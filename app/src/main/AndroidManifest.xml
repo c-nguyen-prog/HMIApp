@@ -34,7 +34,6 @@
         <activity android:name=".Welcome.Welcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -61,7 +60,7 @@
 
         <activity
             android:name=".RecordTripActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -73,7 +72,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".ViewTripActivity"></activity>
+        <activity android:name=".ViewTripActivity" />
     </application>
 
 </manifest>
