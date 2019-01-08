@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.opengl.GLES10;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import java.util.Arrays;
+
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.egl.EGLDisplay;
+import javax.microedition.khronos.opengles.GL10;
 
 public class FragmentRecordWaypoint extends Fragment {
 
@@ -41,9 +50,8 @@ public class FragmentRecordWaypoint extends Fragment {
 
         Bitmap bitmap = BitmapFactory.decodeFile(pathToPicture);
 
-        // TODO clean up and investigate why image is turned in the first place
-        // TODO when gallery app shows picture in right orientation ???
 
+        // This rotates the picture to show it in the correct orientation
         try {
             ExifInterface exif = new ExifInterface(pathToPicture);
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
@@ -64,8 +72,21 @@ public class FragmentRecordWaypoint extends Fragment {
             Log.e("BitMap Rotate Error: ", e.getMessage());
         }
 
-        // TODO fix "Bitmap too large to be uploaded into a texture"
+
+        // This scales the picture to fit the imageView while maintaining the right aspect ratio
+
+        int maxSize = getMaxTextureSize();
+        if(bitmap.getWidth() > maxSize || bitmap.getHeight() > maxSize ){
+            Log.e("SCALE: ", "Image was scaled");
+            float scale = Math.min(((float) 300 / bitmap.getWidth()), ((float) 300 / bitmap.getHeight()));
+            Matrix matrix = new Matrix();
+            matrix.postScale(scale, scale);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        }
+
+        // set modified picture to imageView
         imageView.setImageBitmap(bitmap);
+
 
         v.findViewById(R.id.btnSave).setOnClickListener(view -> {
             listener.onSaveWaypointListener(editName.getText().toString(), editDesc.getText().toString());
@@ -106,4 +127,46 @@ public class FragmentRecordWaypoint extends Fragment {
         super.onDetach();
         listener = null;
     }
+
+    //https://stackoverflow.com/questions/15313807/android-maximum-allowed-width-height-of-bitmap
+    public static int getMaxTextureSize() {
+        // Safe minimum default size
+        final int IMAGE_MAX_BITMAP_DIMENSION = 2048;
+
+        // Get EGL Display
+        EGL10 egl = (EGL10) EGLContext.getEGL();
+        EGLDisplay display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
+
+        // Initialise
+        int[] version = new int[2];
+        egl.eglInitialize(display, version);
+
+        // Query total number of configurations
+        int[] totalConfigurations = new int[1];
+        egl.eglGetConfigs(display, null, 0, totalConfigurations);
+
+        // Query actual list configurations
+        EGLConfig[] configurationsList = new EGLConfig[totalConfigurations[0]];
+        egl.eglGetConfigs(display, configurationsList, totalConfigurations[0], totalConfigurations);
+
+        int[] textureSize = new int[1];
+        int maximumTextureSize = 0;
+
+        // Iterate through all the configurations to located the maximum texture size
+        for (int i = 0; i < totalConfigurations[0]; i++) {
+            // Only need to check for width since opengl textures are always squared
+            egl.eglGetConfigAttrib(display, configurationsList[i], EGL10.EGL_MAX_PBUFFER_WIDTH, textureSize);
+
+            // Keep track of the maximum texture size
+            if (maximumTextureSize < textureSize[0])
+                maximumTextureSize = textureSize[0];
+        }
+
+        // Release
+        egl.eglTerminate(display);
+
+        // Return largest texture size found, or default
+        return Math.max(maximumTextureSize, IMAGE_MAX_BITMAP_DIMENSION);
+    }
+
 }
