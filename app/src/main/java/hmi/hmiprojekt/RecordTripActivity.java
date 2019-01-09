@@ -59,6 +59,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     private Marker startMarker;
     private FragmentRecordWaypoint fragmentRecordWaypoint;
     private Uri pictureUri;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,8 +178,9 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
                         .add(R.id.fragment_record_waypoint_container, fragmentRecordWaypoint)
                         .commit();
 
-                //hide FAB
+                //hide FAB and menu
                 findViewById(R.id.fabAddWaypoint).setVisibility(View.GONE);
+                menu.getItem(0).setVisible(false);
 
             }
         }
@@ -205,6 +207,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.save_trip_menu, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -245,8 +248,9 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
                 .remove(fragmentRecordWaypoint)
                 .commit();
 
-        //show FAB
+        //show FAB and menu
         findViewById(R.id.fabAddWaypoint).setVisibility(View.VISIBLE);
+        menu.getItem(0).setVisible(true);
     }
 
     @Override
@@ -262,8 +266,9 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
                 .remove(fragmentRecordWaypoint)
                 .commit();
 
-        //show FAB
+        //show FAB and menu
         findViewById(R.id.fabAddWaypoint).setVisibility(View.VISIBLE);
+        menu.getItem(0).setVisible(true);
 
     }
 }
