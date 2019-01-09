@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.media.ExifInterface;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -124,7 +125,8 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
                 List<LatLng> decodedPath = PolyUtil.decode(points);
                 //TODO R.color.colorPrimary not working??
-                mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
+                //mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
+                mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
