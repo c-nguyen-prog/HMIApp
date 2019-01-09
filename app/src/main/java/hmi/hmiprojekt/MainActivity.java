@@ -1,5 +1,6 @@
 package hmi.hmiprojekt;
 
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.Manifest;
 import android.app.Activity;
@@ -277,6 +278,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if (tripName != null && tripName.length() >= 1) {
             this.tripName = tripName;
             checkLocationSetting();
+        } else {
+            Snackbar.make(findViewById(R.id.activity_main), "Bitte geben sie einen Namen an.", Snackbar.LENGTH_SHORT).show();
         }
     }
 

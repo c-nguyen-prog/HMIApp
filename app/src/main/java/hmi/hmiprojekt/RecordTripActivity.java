@@ -7,6 +7,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.media.ExifInterface;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -213,7 +214,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
     @Override
     public void onBackPressed() {
-        // TODO snackbar
+        //TODO Dialog with 2 buttons "verwerfen" and "speichern"
     }
 
     public void onSaveTrip(MenuItem item) {
