@@ -2,12 +2,10 @@ package hmi.hmiprojekt;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.media.ExifInterface;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -124,8 +122,6 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
                 String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
 
                 List<LatLng> decodedPath = PolyUtil.decode(points);
-                //TODO R.color.colorPrimary not working??
-                //mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
                 mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
             } catch (JSONException e) {
                 e.printStackTrace();

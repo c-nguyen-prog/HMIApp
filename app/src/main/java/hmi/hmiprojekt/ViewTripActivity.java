@@ -76,7 +76,6 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         if(mTrip.getWaypoints().size() == 0) {
             //TODO Snackbar to inform user that he opened a trip without way points and close the Activity maybe?
         } else {
-            // TODO Investigate get(0) still last waypoint?
             mMap.moveCamera(CameraUpdateFactory
                     .newCameraPosition(CameraPosition
                             .builder()
@@ -102,8 +101,6 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
                 String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
 
                 List<LatLng> decodedPath = PolyUtil.decode(points);
-                //TODO R.color.colorPrimary not working??
-                //mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(Color.parseColor("#E64A19")));
                 mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
             } catch (JSONException e) {
                 e.printStackTrace();
