@@ -103,7 +103,6 @@ public class NearbyConnect {
                     switch (result.getStatus().getStatusCode()) {
                         case ConnectionsStatusCodes.STATUS_OK:
                             Log.e("ConnectionResult", "verbunden!");
-                            connectionsClient.stopAdvertising();
 
 
                             if(fileToSend!=null) {
@@ -112,7 +111,7 @@ public class NearbyConnect {
                                     Payload filePayload = Payload.fromFile(fileToSend);
                                     connectionsClient.sendPayload(endpoint, filePayload);
                                 } catch (FileNotFoundException e) {
-
+                                    Log.e("senden", e.getMessage());
                                 }
                             }
                             break;
@@ -140,6 +139,7 @@ public class NearbyConnect {
             new PayloadCallback() {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
+                    Log.e("Payload", "empfangen");
                     File payloadFile = payload.asFile().asJavaFile();
                     //wo auch immer speichern
                 }
