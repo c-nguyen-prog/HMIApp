@@ -59,7 +59,6 @@ public class NearbyConnect {
         connectionsClient.startDiscovery("hmi.hmiprojekt", endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
-
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
@@ -78,6 +77,7 @@ public class NearbyConnect {
                                     })
                             .addOnFailureListener(
                                     (Exception e) -> {
+                                        Log.e("Endpoint Found", e.getMessage());
                                     });
                 }
 
