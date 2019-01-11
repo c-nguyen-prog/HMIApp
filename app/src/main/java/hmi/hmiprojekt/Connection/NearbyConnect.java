@@ -70,6 +70,7 @@ public class NearbyConnect {
                 @Override
                 public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
                     // An endpoint was found. We request a connection to it.
+                    connectionsClient.stopDiscovery();
                     Log.e("Endpoint Found", "try connecting");
                     connectionsClient.requestConnection(codeName, endpointId, connectionLifecycleCallback)
                             .addOnSuccessListener(
@@ -102,8 +103,9 @@ public class NearbyConnect {
                     switch (result.getStatus().getStatusCode()) {
                         case ConnectionsStatusCodes.STATUS_OK:
                             Log.e("ConnectionResult", "verbunden!");
-                            connectionsClient.stopDiscovery();
                             connectionsClient.stopAdvertising();
+
+
                             if(fileToSend!=null) {
                                 try {
                                     Log.e("ConnectionResult", "senden");
