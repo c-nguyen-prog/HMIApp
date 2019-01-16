@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.media.ExifInterface;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -212,7 +213,15 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
     @Override
     public void onBackPressed() {
-        //TODO Dialog with 2 buttons "verwerfen" and "speichern"
+        //TODO implement trip delete
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Willst du den Trip speichern?")
+                .setCancelable(false)
+                .setPositiveButton("Speichern", (dialog, id) -> finishAfterTransition())
+                .setNegativeButton("Löschen", (dialog, id) -> dialog.cancel());
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     public void onSaveTrip(MenuItem item) {
