@@ -115,7 +115,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public boolean onMarkerClick(Marker marker) {
         //return true if custom behaviour was done
-        // TODO Nico hier ImageView öffnen
+        // TODO Nico hier custom ImageView öffnen !!
         //return false for default behaviour
         return false;
     }

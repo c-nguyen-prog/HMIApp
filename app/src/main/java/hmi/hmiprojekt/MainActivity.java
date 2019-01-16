@@ -18,8 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -27,7 +25,6 @@ import android.widget.RelativeLayout;
 
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
-import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -38,7 +35,6 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
@@ -49,7 +45,6 @@ import hmi.hmiprojekt.MemoryAccess.TripReader;
 import hmi.hmiprojekt.TripComponents.Trip;
 import hmi.hmiprojekt.Welcome.Application;
 import hmi.hmiprojekt.Welcome.Preference;
-import hmi.hmiprojekt.Welcome.Welcome;
 
 public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>
         , NewTripDialog.NewTripDialogListener {
@@ -61,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private LocationHelper locationHelper;
     private String tripName;
     private TripAdapter tripAdapter;
-    private Preference preference;
 
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     WifiManager wifiManager;
@@ -74,19 +68,9 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         setContentView(R.layout.activity_main);
         FloatingActionButton sendFAB = findViewById(R.id.sendFAB);
 
-        sendFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recieveTrip();
-            }
-        });
+        sendFAB.setOnClickListener(v -> recieveTrip());
 
-        findViewById(R.id.mainFab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showNewTripDialog();
-            }
-        });
+        findViewById(R.id.mainFab).setOnClickListener(view -> showNewTripDialog());
     }
 
     @Override
@@ -120,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     private void initShowcaseTutorial() {
         //Get preference and checks if it's the first time MainActivity is loaded, if yes->showcase
-        preference = Application.getApp().getPreference();
+        Preference preference = Application.getApp().getPreference();
         Log.e("Preference REQ", Boolean.toString(preference.isMAFirstTimeLaunch()));
         RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -193,28 +177,22 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(settingsRequest);
 
-        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                // All location settings are satisfied.
-                startTrip();
-            }
+        task.addOnSuccessListener(this, locationSettingsResponse -> {
+            // All location settings are satisfied.
+            startTrip();
         });
 
         //OnFailure ask User to change settings
-        task.addOnFailureListener(this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (e instanceof ResolvableApiException) {
-                    //Location Service is off
-                    try {
-                        // Show the dialog by calling startResolutionForResult(),
-                        ResolvableApiException resolvable = (ResolvableApiException) e;
-                        resolvable.startResolutionForResult(MainActivity.this,
-                                REQUEST_CHECK_SETTINGS);
-                    } catch (Exception sendEx) {
-                        // Ignore error
-                    }
+        task.addOnFailureListener(this, e -> {
+            if (e instanceof ResolvableApiException) {
+                //Location Service is off
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    ResolvableApiException resolvable = (ResolvableApiException) e;
+                    resolvable.startResolutionForResult(MainActivity.this,
+                            REQUEST_CHECK_SETTINGS);
+                } catch (Exception sendEx) {
+                    // Ignore error
                 }
             }
         });
