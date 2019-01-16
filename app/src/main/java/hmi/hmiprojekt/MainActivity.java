@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             showcase.setButtonPosition(lps);
 
         } else {
+            //TODO delete?
             Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -238,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                 break;
             case REQUEST_VIEW_TRIP:
                 if(resultCode == Activity.RESULT_CANCELED) {
+                    //TODO move FAB up when Snackbar shows
                     Snackbar.make(findViewById(R.id.activity_main), "Der geöffnete Trip scheint beschädigt zu sein", Snackbar.LENGTH_LONG).show();
                 }
         }
@@ -272,9 +274,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             intent.putExtra("tripName", tripName);
             startActivity(intent);
         } else {
-            Toast.makeText(getBaseContext()
-                    , "Position error pls try again"
-                    , Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.activity_main), "Position error pls try again", Snackbar.LENGTH_SHORT).show();
         }
     }
 

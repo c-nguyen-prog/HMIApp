@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -15,6 +16,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import hmi.hmiprojekt.R;
 
 public class    LocationHelper {
 
@@ -47,8 +50,7 @@ public class    LocationHelper {
             // contacts-related task you need to do.
             requestLocation(activity);
         } else {
-            // permission denied, boo!
-            // TODO inform user
+            Snackbar.make(activity.findViewById(R.id.activity_main), "Bitte erlaube die Positionsabfrage", Snackbar.LENGTH_SHORT).show();
         }
     }
 
