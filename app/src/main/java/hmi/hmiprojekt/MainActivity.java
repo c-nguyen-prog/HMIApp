@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         , NewTripDialog.NewTripDialogListener {
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
+    private static final int REQUEST_VIEW_TRIP = 400;
     private final static int PERMISSION_REQUEST_LOCATION = 200;
     private final static int PERMISSION_WRITE_EXTERNAL_STORAGE = 300;
     private LocationHelper locationHelper;
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     Intent intent = new Intent(MainActivity.this, ViewTripActivity.class);
                     intent.putExtra("tripDir", clickedTrip.getDir());
                     startActivity(intent);
+                    startActivityForResult(intent, REQUEST_VIEW_TRIP);
                 }
 
                 @Override
@@ -228,12 +230,16 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
-                        Toast.makeText(MainActivity.this, "Cannot start trip without location", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Cannot start trip without location", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
                 }
                 break;
+            case REQUEST_VIEW_TRIP:
+                if(resultCode == Activity.RESULT_CANCELED) {
+                    Snackbar.make(findViewById(R.id.activity_main), "Der geöffnete Trip scheint beschädigt zu sein", Snackbar.LENGTH_LONG).show();
+                }
         }
     }
 

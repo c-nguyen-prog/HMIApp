@@ -1,5 +1,6 @@
 package hmi.hmiprojekt;
 
+import android.app.Activity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -74,7 +75,8 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
         // set camera over start position
         if(mTrip.getWaypoints().size() == 0) {
-            //TODO Snackbar to inform user that he opened a trip without way points and close the Activity maybe?
+            setResult(Activity.RESULT_CANCELED);
+            finish();
         } else {
             mMap.moveCamera(CameraUpdateFactory
                     .newCameraPosition(CameraPosition
@@ -113,7 +115,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public boolean onMarkerClick(Marker marker) {
         //return true if custom behaviour was done
-        // TODO ImageView öffnen
+        // TODO Nico hier ImageView öffnen
         //return false for default behaviour
         return false;
     }

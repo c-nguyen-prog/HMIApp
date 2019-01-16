@@ -113,7 +113,6 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
         String urlHead = "https://maps.googleapis.com/maps/api/directions/json?origin=";
 
-        //TODO change mode?
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
                 urlHead + origin + "&destination=" + destination + "&mode=walking"
                         + "&key=" + getString(R.string.google_maps_key), null,
