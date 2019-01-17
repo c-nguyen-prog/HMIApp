@@ -92,15 +92,11 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
             initShowcaseTutorial();
 
-            tripAdapter.setOnItemClickListener(new TripAdapter.ClickListener() {
-                @Override
-                public void onItemClick(int position, View v) {
-                    Trip clickedTrip = tripAdapter.getTrip(position);
-                    Intent intent = new Intent(MainActivity.this, ViewTripActivity.class);
-                    intent.putExtra("tripDir", clickedTrip.getDir());
-                    startActivity(intent);
-                    startActivityForResult(intent, REQUEST_VIEW_TRIP);
-                }
+            tripAdapter.setOnItemClickListener((position, v) -> {
+                Trip clickedTrip = tripAdapter.getTrip(position);
+                Intent intent = new Intent(MainActivity.this, ViewTripActivity.class);
+                intent.putExtra("tripDir", clickedTrip.getDir());
+                startActivityForResult(intent, REQUEST_VIEW_TRIP);
             });
         }
     }

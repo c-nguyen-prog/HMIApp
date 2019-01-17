@@ -216,7 +216,6 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Willst du den Trip speichern?")
-                .setCancelable(false)
                 .setPositiveButton("Speichern", (dialog, id) -> finishAfterTransition())
                 .setNegativeButton("Löschen", (dialog, id) -> dialog.cancel());
         AlertDialog alert = builder.create();
