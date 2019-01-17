@@ -122,7 +122,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onBackPressed() {
+        setResult(Activity.RESULT_OK);
         super.onBackPressed();
-        finish();
     }
 }
