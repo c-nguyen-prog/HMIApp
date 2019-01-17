@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ import hmi.hmiprojekt.Connection.Zipper;
 import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.Config;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
+import hmi.hmiprojekt.MemoryAccess.TripWriter;
 import hmi.hmiprojekt.TripComponents.Trip;
 import hmi.hmiprojekt.Welcome.Application;
 import hmi.hmiprojekt.Welcome.Preference;
@@ -75,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         sendFAB.setOnClickListener(v -> recieveTrip());
 
         findViewById(R.id.mainFab).setOnClickListener(view -> showNewTripDialog());
+
+
     }
 
     @Override
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_WRITE_EXTERNAL_STORAGE);
         } else {
             initRecycler();
+
             initShowcaseTutorial();
 
             tripAdapter.setOnItemClickListener(new TripAdapter.ClickListener() {
@@ -95,12 +100,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     intent.putExtra("tripDir", clickedTrip.getDir());
                     startActivity(intent);
                     startActivityForResult(intent, REQUEST_VIEW_TRIP);
-                }
-
-                @Override
-                public void onItemLongClick(int position, View v) {
-                    sendTrip(tripAdapter.getTrip(position));
-
                 }
             });
         }
@@ -161,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         tripAdapter = new TripAdapter(trips);
         mainRecycler.setAdapter(tripAdapter);
         tripAdapter.notifyDataSetChanged();
+        registerForContextMenu(mainRecycler);
     }
 
     private void startTrip() {
@@ -328,4 +328,25 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        int position = -1;
+        try {
+            position = tripAdapter.getPosition();
+        } catch (Exception e) {
+            Log.d("CONTEXTMENU ", e.getLocalizedMessage());
+            return super.onContextItemSelected(item);
+        }
+        Trip trip = tripAdapter.getTrip(position);
+        switch (item.getItemId()) {
+            case R.id.send:
+                sendTrip(trip);
+                break;
+            case R.id.delete:
+                TripWriter.deleteTrip(trip);
+                initRecycler();
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
 }

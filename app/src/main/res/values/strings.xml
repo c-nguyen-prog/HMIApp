@@ -18,4 +18,6 @@
     <string name="beschreibung">Beschreibung</string>
     <string name="titel">Titel</string>
     <string name="verwerfen">verwerfen</string>
+    <string name="delete">delete</string>
+    <string name="send">send</string>
 </resources>
