@@ -1,5 +1,6 @@
 package hmi.hmiprojekt.Connection;
 
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.android.gms.nearby.Nearby;
@@ -19,6 +20,7 @@ import com.google.android.gms.nearby.connection.Strategy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Random;
 
 import hmi.hmiprojekt.MainActivity;
@@ -141,7 +143,11 @@ public class NearbyConnect {
                 public void onPayloadReceived(String endpointId, Payload payload) {
                     Log.e("Payload", "empfangen");
                     File payloadFile = payload.asFile().asJavaFile();
-                    //wo auch immer speichern
+                    try {
+                        Zipper.unzip(payloadFile, new File(Environment.getExternalStorageDirectory() + "/roadbook/"));
+                    } catch (IOException e) {
+                        Log.e("ZIP", e.getMessage());
+                    }
                 }
 
                 @Override

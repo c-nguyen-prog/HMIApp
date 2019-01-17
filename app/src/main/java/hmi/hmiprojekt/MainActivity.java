@@ -1,5 +1,6 @@
 package hmi.hmiprojekt;
 
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.Manifest;
@@ -38,7 +39,10 @@ import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.File;
+
 import hmi.hmiprojekt.Connection.NearbyConnect;
+import hmi.hmiprojekt.Connection.Zipper;
 import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.Config;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
@@ -283,7 +287,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
             }
-            connectionsClient.sender(trip.getDir());
+            Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip");
+            connectionsClient.sender(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip"));
         }
     }
 
