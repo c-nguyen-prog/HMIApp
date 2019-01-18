@@ -270,7 +270,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
         } else {
-            connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
+            connectionsClient = new NearbyConnect(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"),
+                    Nearby.getConnectionsClient(this), getApplicationContext());
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
@@ -285,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                 Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
             }
             Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip.zip");
-            connectionsClient.sender(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"));
+            connectionsClient.sender();
         }
     }
 
@@ -293,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
         } else {
-            connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
+            connectionsClient = new NearbyConnect(null, Nearby.getConnectionsClient(this), getApplicationContext());
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
@@ -314,10 +315,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     public void setBluetoothAdapter(){
         if(!bluetoothAdapter.isEnabled()){
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1);
-            Toast.makeText(getApplicationContext(),"Bluetooth aktiv",Toast.LENGTH_SHORT).show();
         } else {
             bluetoothAdapter.disable();
-            Toast.makeText(getApplicationContext(),"Bluetooth inaktiv",Toast.LENGTH_SHORT).show();
         }
     }
 

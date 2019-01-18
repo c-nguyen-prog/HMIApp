@@ -1,7 +1,9 @@
 package hmi.hmiprojekt.Connection;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
@@ -21,20 +23,33 @@ import com.google.android.gms.nearby.connection.Strategy;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 
 import hmi.hmiprojekt.MainActivity;
+import hmi.hmiprojekt.MemoryAccess.Config;
 
 public class NearbyConnect {
     private ConnectionsClient connectionsClient;
     private String endpoint;
     private String codeName;
     private File fileToSend=null;
+    private Context context;
 
-    public NearbyConnect(ConnectionsClient connectionsClient){
+    public NearbyConnect(File fileToSend, ConnectionsClient connectionsClient, Context context){
+        this.fileToSend = fileToSend;
         this.connectionsClient = connectionsClient;
         Random r = new Random();
         codeName = Integer.toString(r.nextInt(1000 - 1));
+        this.context = context;
     }
 
     private void startAdvertisingHere() {
@@ -46,6 +61,8 @@ public class NearbyConnect {
                         (Void unused) -> {
                             // We're advertising!
                             Log.e("Advertising", "Advertising gestartet");
+                            Toast.makeText(context,"Advertise",Toast.LENGTH_SHORT).show();
+
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
@@ -56,6 +73,7 @@ public class NearbyConnect {
 
     private void startDiscoveryHere() {
         Log.e("Discovery", "Suche gestartet");
+        Toast.makeText(context,"Discovery",Toast.LENGTH_SHORT).show();
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
         connectionsClient.startDiscovery("hmi.hmiprojekt", endpointDiscoveryCallback, discoveryOptions)
@@ -74,6 +92,8 @@ public class NearbyConnect {
                     // An endpoint was found. We request a connection to it.
                     connectionsClient.stopDiscovery();
                     Log.e("Endpoint Found", "try connecting");
+                    Toast.makeText(context,"Endpoint found",Toast.LENGTH_SHORT).show();
+
                     connectionsClient.requestConnection(codeName, endpointId, connectionLifecycleCallback)
                             .addOnSuccessListener(
                                     (Void unused) -> {
@@ -97,7 +117,8 @@ public class NearbyConnect {
                     // Automatically accept the connection on both sides.
                     Log.e("Connection", "connection akzeptieren");
                     connectionsClient.acceptConnection(endpointId, payloadCallback);
-                    endpoint=connectionInfo.getEndpointName();
+                    //TODO: HERE ERROR?
+                    //endpoint=endpointId;
                 }
 
                 @Override
@@ -105,16 +126,19 @@ public class NearbyConnect {
                     switch (result.getStatus().getStatusCode()) {
                         case ConnectionsStatusCodes.STATUS_OK:
                             Log.e("ConnectionResult", "verbunden!");
-
+                            Toast.makeText(context,"Connected",Toast.LENGTH_SHORT).show();
 
                             if(fileToSend!=null) {
                                 try {
                                     Log.e("ConnectionResult", "senden");
-                                    Payload filePayload = Payload.fromFile(fileToSend);
-                                    connectionsClient.sendPayload(endpoint, filePayload);
+                                    Toast.makeText(context,"Trying to send file",Toast.LENGTH_SHORT).show();
+                                    Payload filePayload = Payload.fromFile(fileToSend); //TODO: ERROR?
+                                    connectionsClient.sendPayload(endpointId, filePayload);
                                 } catch (FileNotFoundException e) {
                                     Log.e("senden", e.getMessage());
                                 }
+                            } else {
+                                Toast.makeText(context,"fileToSend NULL",Toast.LENGTH_SHORT).show();
                             }
                             break;
                         case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
@@ -142,11 +166,18 @@ public class NearbyConnect {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
                     Log.e("Payload", "empfangen");
-                    File payloadFile = payload.asFile().asJavaFile();
-                    try {
-                        Zipper.unzip(payloadFile, new File(Environment.getExternalStorageDirectory() + "/roadbook/"));
-                    } catch (IOException e) {
-                        Log.e("ZIP", e.getMessage());
+                    Toast.makeText(context,"File received",Toast.LENGTH_SHORT).show();
+                    File lastFilePath = getLatestFilefromDir(Environment.getExternalStorageDirectory() + "/Download/Nearby");
+                    if (lastFilePath != null) {
+                        try {
+                            Date todayDate = Calendar.getInstance().getTime();
+                            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                            String dirName = dateFormat.format(todayDate) + "_SharedTrip";
+                            Zipper.unzip(lastFilePath, new File(Environment.getExternalStorageDirectory() + "/roadbook/" + dirName));
+                            Toast.makeText(context,"unzipping file to /roadbook/" + dirName,Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Log.e("ZIP", e.getMessage());
+                        }
                     }
                 }
 
@@ -154,15 +185,31 @@ public class NearbyConnect {
                 public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
                     if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                         connectionsClient.disconnectFromEndpoint(endpoint);
+                        Toast.makeText(context,"Bye!",Toast.LENGTH_SHORT).show();
+
                     }
                 }
             };
 
-    public void sender(File file){
+    private File getLatestFilefromDir(String dirPath){
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+        if (files == null || files.length == 0) {
+            return null;
+        }
 
+        File lastModifiedFile = files[0];
+        for (int i = 1; i < files.length; i++) {
+            if (lastModifiedFile.lastModified() < files[i].lastModified()) {
+                lastModifiedFile = files[i];
+            }
+        }
+        return lastModifiedFile;
+    }
+
+    public void sender(){
         startAdvertisingHere();
         startDiscoveryHere();
-        fileToSend=file;
 
     }
 
