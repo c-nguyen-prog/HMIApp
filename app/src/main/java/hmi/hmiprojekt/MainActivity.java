@@ -114,9 +114,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if (preference.isMAFirstTimeLaunch()) {
             preference.setMAFirstTimeLaunch(false);
             Log.e("Preference SET", Boolean.toString(preference.isMAFirstTimeLaunch()));
-            Toast.makeText(this, "This is first time MA is loaded", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "This is first time MA is loaded", Toast.LENGTH_SHORT).show();
 
-            //DO SHOWCASE HERE
             ShowcaseView showcase = new ShowcaseView.Builder(this)
                     .setTarget(new ViewTarget(R.id.mainFab, this))
                     .setContentTitle("SHOWCASE TUTORIAL")
@@ -127,8 +126,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             showcase.setButtonPosition(lps);
 
         } else {
-            //TODO delete?
-            Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
+            //Code for when MainActivity is rendered again
+            //Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -275,16 +274,18 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
+                Toast.makeText(getApplicationContext(),"Bluetooth temporarily enabled",Toast.LENGTH_SHORT).show();
             }
             try {
                 if (!wifiManager.isWifiEnabled()) {
                     setWifi();
+                    Toast.makeText(getApplicationContext(),"Wifi temporarily enabled",Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
             }
-            Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip");
-            connectionsClient.sender(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip"));
+            Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip.zip");
+            connectionsClient.sender(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"));
         }
     }
 
@@ -296,10 +297,12 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
+                Toast.makeText(getApplicationContext(),"Bluetooth temporarily enabled",Toast.LENGTH_SHORT).show();
             }
             try {
                 if (!wifiManager.isWifiEnabled()) {
                     setWifi();
+                    Toast.makeText(getApplicationContext(),"Wifi temporarily enabled",Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
