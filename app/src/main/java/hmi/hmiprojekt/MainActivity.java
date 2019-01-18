@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import android.widget.RelativeLayout;
@@ -57,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private static final int REQUEST_VIEW_TRIP = 400;
+    private static final int REQUEST_RECORD_TRIP = 700;
     private final static int PERMISSION_REQUEST_LOCATION = 200;
     private final static int PERMISSION_WRITE_EXTERNAL_STORAGE = 300;
     private final static int PERMISSION_BLUETOOTH_ADMIN = 500;
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         setContentView(R.layout.activity_main);
         FloatingActionButton sendFAB = findViewById(R.id.sendFAB);
 
-        sendFAB.setOnClickListener(v -> recieveTrip());
+        sendFAB.setOnClickListener(v -> receiveTrip());
 
         findViewById(R.id.mainFab).setOnClickListener(view -> showNewTripDialog());
 
@@ -221,6 +221,14 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     //TODO move FAB up when Snackbar shows
                     Snackbar.make(findViewById(R.id.activity_main), "Der geöffnete Trip scheint beschädigt zu sein", Snackbar.LENGTH_LONG).show();
                 }
+            case REQUEST_RECORD_TRIP:
+                if(resultCode == Activity.RESULT_CANCELED) {
+                    if(data.hasExtra("error")) {
+                        Snackbar.make(findViewById(R.id.activity_main), data.getStringExtra("error"), Snackbar.LENGTH_LONG).show();
+                    } else {
+                        Snackbar.make(findViewById(R.id.activity_main), "Fehler beim Aufnehmen eines Trips", Snackbar.LENGTH_LONG).show();
+                    }
+                }
         }
     }
 
@@ -267,9 +275,9 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             Intent intent = new Intent(MainActivity.this, RecordTripActivity.class);
             intent.putExtra("currentPosition", new LatLng( location.getLatitude(), location.getLongitude()));
             intent.putExtra("tripName", tripName);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_RECORD_TRIP);
         } else {
-            Snackbar.make(findViewById(R.id.activity_main), "Position error pls try again", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.activity_main), "Positionsfehler", Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -308,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
-    private void recieveTrip(){
+    private void receiveTrip(){
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
         } else {

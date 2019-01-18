@@ -61,6 +61,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     private FragmentRecordWaypoint fragmentRecordWaypoint;
     private Uri pictureUri;
     private Menu menu;
+    private boolean hasWaypoint = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +73,13 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         mTrip = new Trip(getIntent().getStringExtra("tripName"));
 
         //create Directory so we can save images in it
-        //TODO HANDLE EXCEPTION WHERE USER WANTS SAME TRIP NAME ON SAME DAY
         try {
             TripWriter.createTripDir(mTrip);
         } catch (Exception e) {
-            e.printStackTrace();
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("error", "Trip Ordner konnte nicht erstellt werden");
+            setResult(RESULT_CANCELED, resultIntent);
+            finish();
         }
 
         setTitle(getIntent().getStringExtra("tripName"));
@@ -212,19 +215,33 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
     @Override
     public void onBackPressed() {
-        //TODO implement trip delete
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Willst du den Trip speichern?")
-                .setPositiveButton("Speichern", (dialog, id) -> finishAfterTransition())
-                .setNegativeButton("Löschen", (dialog, id) -> dialog.cancel());
+                .setPositiveButton("Speichern", (dialog, id) -> {
+                    setResult(RESULT_OK);
+                    finishAfterTransition();
+                })
+                .setNegativeButton("Abbrechen", (dialog, id) -> dialog.cancel());
         AlertDialog alert = builder.create();
         alert.show();
     }
 
     public void onSaveTrip(MenuItem item) {
-        // TODO manage saving trip without way points
-        finishAfterTransition();
+        if(!hasWaypoint) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Ein Trip kann ohne Bilder nicht gespeichert werden.")
+                    .setPositiveButton("Löschen", (dialog, id) -> {
+                        TripWriter.deleteTrip(mTrip);
+                        setResult(RESULT_OK);
+                        finishAfterTransition();
+                    })
+                    .setNegativeButton("Abbrechen", (dialog, id) -> dialog.cancel());
+            AlertDialog alert = builder.create();
+            alert.show();
+        } else {
+            setResult(RESULT_OK);
+            finishAfterTransition();
+        }
     }
 
     @Override
@@ -257,6 +274,8 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         //show FAB and menu
         findViewById(R.id.fabAddWaypoint).setVisibility(View.VISIBLE);
         menu.getItem(0).setVisible(true);
+
+        hasWaypoint = true;
     }
 
     @Override
