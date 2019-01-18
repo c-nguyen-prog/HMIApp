@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private static final int REQUEST_VIEW_TRIP = 400;
     private final static int PERMISSION_REQUEST_LOCATION = 200;
     private final static int PERMISSION_WRITE_EXTERNAL_STORAGE = 300;
+    private final static int PERMISSION_BLUETOOTH_ADMIN = 500;
+    private final static int PERMISSION_ACCESS_WIFI_STATE = 600;
     private LocationHelper locationHelper;
     private String tripName;
     private TripAdapter tripAdapter;
@@ -238,6 +240,22 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                             , Toast.LENGTH_SHORT).show();
                 }
             }
+            case PERMISSION_BLUETOOTH_ADMIN:{
+                if(!(grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    Toast.makeText(getBaseContext(),
+                            "Can't send or receive without Bluetooth",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            case PERMISSION_ACCESS_WIFI_STATE:{
+                if(!(grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)){
+                    Toast.makeText(getBaseContext(),
+                            "Can't send or receive without Wifi",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
@@ -313,16 +331,29 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     }
 
     public void setBluetoothAdapter(){
-        if(!bluetoothAdapter.isEnabled()){
-            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),1);
-        } else {
-            bluetoothAdapter.disable();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_ADMIN}, PERMISSION_BLUETOOTH_ADMIN);
+        }else {
+            if (!bluetoothAdapter.isEnabled()) {
+                startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
+            } else {
+                bluetoothAdapter.disable();
+            }
         }
     }
 
     public void setWifi(){
-        if(!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_WIFI_STATE}, PERMISSION_ACCESS_WIFI_STATE);
+        }else {
+            wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+            if (!wifiManager.isWifiEnabled()) {
+                wifiManager.setWifiEnabled(true);
+            } else {
+                wifiManager.setWifiEnabled(false);
+            }
         }
     }
 

@@ -39,9 +39,8 @@ import hmi.hmiprojekt.MemoryAccess.Config;
 
 public class NearbyConnect {
     private ConnectionsClient connectionsClient;
-    private String endpoint;
     private String codeName;
-    private File fileToSend=null;
+    private File fileToSend;
     private Context context;
 
     public NearbyConnect(File fileToSend, ConnectionsClient connectionsClient, Context context){
@@ -60,7 +59,6 @@ public class NearbyConnect {
                 .addOnSuccessListener(
                         (Void unused) -> {
                             // We're advertising!
-                            Log.e("Advertising", "Advertising gestartet");
                             Toast.makeText(context,"Advertise",Toast.LENGTH_SHORT).show();
 
                         })
@@ -91,6 +89,7 @@ public class NearbyConnect {
                 public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
                     // An endpoint was found. We request a connection to it.
                     connectionsClient.stopDiscovery();
+                    connectionsClient.stopAdvertising();
                     Log.e("Endpoint Found", "try connecting");
                     Toast.makeText(context,"Endpoint found",Toast.LENGTH_SHORT).show();
 
@@ -127,6 +126,7 @@ public class NearbyConnect {
                         case ConnectionsStatusCodes.STATUS_OK:
                             Log.e("ConnectionResult", "verbunden!");
                             Toast.makeText(context,"Connected",Toast.LENGTH_SHORT).show();
+
 
                             if(fileToSend!=null) {
                                 try {
@@ -184,7 +184,7 @@ public class NearbyConnect {
                 @Override
                 public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
                     if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
-                        connectionsClient.disconnectFromEndpoint(endpoint);
+                        connectionsClient.disconnectFromEndpoint(endpointId);
                         Toast.makeText(context,"Bye!",Toast.LENGTH_SHORT).show();
 
                     }
