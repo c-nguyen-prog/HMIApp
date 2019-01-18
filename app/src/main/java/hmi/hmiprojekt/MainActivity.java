@@ -219,16 +219,20 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             case REQUEST_VIEW_TRIP:
                 if(resultCode == Activity.RESULT_CANCELED) {
                     //TODO move FAB up when Snackbar shows
-                    Snackbar.make(findViewById(R.id.activity_main), "Der geöffnete Trip scheint beschädigt zu sein", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.activity_main), "Der ausgewählte Trip scheint beschädigt zu sein", Snackbar.LENGTH_LONG).show();
                 }
+                break;
             case REQUEST_RECORD_TRIP:
                 if(resultCode == Activity.RESULT_CANCELED) {
-                    if(data.hasExtra("error")) {
-                        Snackbar.make(findViewById(R.id.activity_main), data.getStringExtra("error"), Snackbar.LENGTH_LONG).show();
-                    } else {
-                        Snackbar.make(findViewById(R.id.activity_main), "Fehler beim Aufnehmen eines Trips", Snackbar.LENGTH_LONG).show();
+                    if (data != null) {
+                        if (data.hasExtra("error")) {
+                            Snackbar.make(findViewById(R.id.activity_main), data.getStringExtra("error"), Snackbar.LENGTH_LONG).show();
+                        } else {
+                            Snackbar.make(findViewById(R.id.activity_main), "Fehler beim Aufnehmen eines Trips", Snackbar.LENGTH_LONG).show();
+                        }
                     }
                 }
+                break;
         }
     }
 
