@@ -151,7 +151,6 @@ public class NearbyConnect {
             new PayloadCallback() {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
-                    Log.e("Payload", "empfangen");
                     Toast.makeText(context,"File received",Toast.LENGTH_SHORT).show();
                     File lastFilePath = getLatestFilefromDir(Environment.getExternalStorageDirectory() + "/Download/Nearby");
                     if (lastFilePath != null) {
@@ -160,7 +159,6 @@ public class NearbyConnect {
                             DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
                             String dirName = dateFormat.format(todayDate) + "_SharedTrip";
                             Zipper.unzip(lastFilePath, new File(Environment.getExternalStorageDirectory() + "/roadbook/" + dirName));
-                            Toast.makeText(context,"unzipping file to /roadbook/" + dirName,Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             Log.e("ZIP", e.getMessage());
                         }
