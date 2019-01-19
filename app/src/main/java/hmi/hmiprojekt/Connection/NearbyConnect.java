@@ -1,8 +1,12 @@
 package hmi.hmiprojekt.Connection;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Environment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.nearby.Nearby;
@@ -59,19 +63,16 @@ public class NearbyConnect {
                 .addOnSuccessListener(
                         (Void unused) -> {
                             // We're advertising!
-                            Toast.makeText(context,"Advertise",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context,"Searching for a companion",Toast.LENGTH_SHORT).show();
 
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
                             // We were unable to start advertising.
-                            Log.e("Advertising", "Advertising abgebrochen");
                         });
     }
 
     private void startDiscoveryHere() {
-        Log.e("Discovery", "Suche gestartet");
-        Toast.makeText(context,"Discovery",Toast.LENGTH_SHORT).show();
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
         connectionsClient.startDiscovery("hmi.hmiprojekt", endpointDiscoveryCallback, discoveryOptions)
@@ -90,8 +91,7 @@ public class NearbyConnect {
                     // An endpoint was found. We request a connection to it.
                     connectionsClient.stopDiscovery();
                     connectionsClient.stopAdvertising();
-                    Log.e("Endpoint Found", "try connecting");
-                    Toast.makeText(context,"Endpoint found",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Companion found",Toast.LENGTH_SHORT).show();
 
                     connectionsClient.requestConnection(codeName, endpointId, connectionLifecycleCallback)
                             .addOnSuccessListener(
@@ -99,7 +99,6 @@ public class NearbyConnect {
                                     })
                             .addOnFailureListener(
                                     (Exception e) -> {
-                                        Log.e("Endpoint Found", e.getMessage());
                                     });
                 }
 
@@ -114,40 +113,27 @@ public class NearbyConnect {
                 @Override
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
                     // Automatically accept the connection on both sides.
-                    Log.e("Connection", "connection akzeptieren");
                     connectionsClient.acceptConnection(endpointId, payloadCallback);
-                    //TODO: HERE ERROR?
-                    //endpoint=endpointId;
                 }
 
                 @Override
                 public void onConnectionResult(String endpointId, ConnectionResolution result) {
                     switch (result.getStatus().getStatusCode()) {
                         case ConnectionsStatusCodes.STATUS_OK:
-                            Log.e("ConnectionResult", "verbunden!");
-                            Toast.makeText(context,"Connected",Toast.LENGTH_SHORT).show();
-
-
                             if(fileToSend!=null) {
                                 try {
-                                    Log.e("ConnectionResult", "senden");
-                                    Toast.makeText(context,"Trying to send file",Toast.LENGTH_SHORT).show();
-                                    Payload filePayload = Payload.fromFile(fileToSend); //TODO: ERROR?
+                                    Payload filePayload = Payload.fromFile(fileToSend);
                                     connectionsClient.sendPayload(endpointId, filePayload);
                                 } catch (FileNotFoundException e) {
                                     Log.e("senden", e.getMessage());
                                 }
-                            } else {
-                                Toast.makeText(context,"fileToSend NULL",Toast.LENGTH_SHORT).show();
                             }
                             break;
                         case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                             // The connection was rejected by one or both sides.
-                            Log.e("ConnectionResult", "Verbindung wurde abgelehnt");
                             break;
                         case ConnectionsStatusCodes.STATUS_ERROR:
                             // The connection broke before it was able to be accepted.
-                            Log.e("ConnectionResult", "Verbindung wurde unterbrochen");
                             break;
                         default:
                             // Unknown status code
@@ -185,7 +171,10 @@ public class NearbyConnect {
                 public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
                     if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                         connectionsClient.disconnectFromEndpoint(endpointId);
-                        Toast.makeText(context,"Bye!",Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setMessage("The trip is saved on your Device. You can disable Wifi and Bluetooth if you want.")
+                                .setTitle("Success!");
+                        builder.create();
 
                     }
                 }
@@ -207,26 +196,8 @@ public class NearbyConnect {
         return lastModifiedFile;
     }
 
-    public void sender(){
-        startAdvertisingHere();
-        startDiscoveryHere();
-
-    }
-
-    public void receiver(){
+    public void start(){
         startAdvertisingHere();
         startDiscoveryHere();
     }
 }
-/*
-
-  public void sendFile(File file){
-    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
-    connectionsClient.sender(file);
-  }
-
-  public void receiveFile(){
-    NearbyConnect connectionsClient = new NearbyConnect(Nearby.getConnectionsClient(this));
-    connectionsClient.receiver();
-  }
- */

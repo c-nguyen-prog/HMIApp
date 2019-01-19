@@ -305,18 +305,18 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
-                Toast.makeText(getApplicationContext(),"Bluetooth temporarily enabled",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Bluetooth enabled",Toast.LENGTH_SHORT).show();
             }
             try {
                 if (!wifiManager.isWifiEnabled()) {
                     setWifi();
-                    Toast.makeText(getApplicationContext(),"Wifi temporarily enabled",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Wifi enabled",Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
             }
             Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip.zip");
-            connectionsClient.sender();
+            connectionsClient.start();
         }
     }
 
@@ -328,17 +328,17 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
-                Toast.makeText(getApplicationContext(),"Bluetooth temporarily enabled",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Bluetooth enabled",Toast.LENGTH_SHORT).show();
             }
             try {
                 if (!wifiManager.isWifiEnabled()) {
                     setWifi();
-                    Toast.makeText(getApplicationContext(),"Wifi temporarily enabled",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Wifi enabled",Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
             }
-            connectionsClient.receiver();
+            connectionsClient.start();
         }
     }
 
@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     new String[]{Manifest.permission.BLUETOOTH_ADMIN}, PERMISSION_BLUETOOTH_ADMIN);
         }else {
             if (!bluetoothAdapter.isEnabled()) {
-                startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
+                bluetoothAdapter.enable();
             } else {
                 bluetoothAdapter.disable();
             }
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_WIFI_STATE}, PERMISSION_ACCESS_WIFI_STATE);
         }else {
-            wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+            wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!wifiManager.isWifiEnabled()) {
                 wifiManager.setWifiEnabled(true);
             } else {
