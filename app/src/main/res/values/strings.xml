@@ -20,4 +20,6 @@
     <string name="verwerfen">verwerfen</string>
     <string name="delete">delete</string>
     <string name="send">send</string>
+    <string name="new_trip">New Trip</string>
+    <string name="receive_trip">Receive Trip</string>
 </resources>

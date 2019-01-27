@@ -19,10 +19,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import android.widget.RelativeLayout;
+import android.widget.Toolbar;
 
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
@@ -74,12 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         super.onCreate(savedInstanceState);
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
-        FloatingActionButton sendFAB = findViewById(R.id.sendFAB);
-
-        sendFAB.setOnClickListener(v -> receiveTrip());
-
         findViewById(R.id.mainFab).setOnClickListener(view -> showNewTripDialog());
-
 
     }
 
@@ -389,5 +387,25 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                 break;
         }
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.main_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId()==R.id.newTrip){
+            showNewTripDialog();
+        }
+
+        if (item.getItemId()==R.id.receiveTrip){
+            receiveTrip();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
