@@ -1,5 +1,6 @@
 package hmi.hmiprojekt;
 
+import android.os.Build;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -23,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 import android.widget.RelativeLayout;
 import android.widget.Toolbar;
@@ -75,6 +78,11 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
+        getSupportActionBar().hide();
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
         findViewById(R.id.mainFab).setOnClickListener(view -> showNewTripDialog());
