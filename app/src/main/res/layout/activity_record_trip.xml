@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/activity_record_trip">
@@ -26,11 +27,18 @@
         android:id="@+id/fabAddWaypoint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_camera_alt_white_24dp"
-        android:focusable="true" />
+        android:tint="@color/light_gray_overlay"
+        app:backgroundTint="@android:color/white"
+        app:backgroundTintMode="src_in"
+        app:rippleColor="@color/light_white_overlay" />
 
 </RelativeLayout>

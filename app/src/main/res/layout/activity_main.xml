@@ -43,13 +43,12 @@
         android:id="@+id/mainFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/ic_add_white_24dp"
-        android:tint="@android:color/white"
-        app:backgroundTint="@color/light_white_overlay"
-         />
+        android:tint="@color/light_gray_overlay"
+        app:backgroundTint="@android:color/white" />
 
 </android.support.design.widget.CoordinatorLayout>

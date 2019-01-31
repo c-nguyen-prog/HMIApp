@@ -3,14 +3,14 @@
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="title_activity_maps">Map</string>
 
-    <string name="next">NEXT</string>
-    <string name="skip">SKIP</string>
+    <string name="next">WEITER</string>
+    <string name="skip">ÜBERSPRINGEN</string>
     <string name="start">Start!</string>
-    <string name="slide_1_title">Welcome to RoadBook!</string>
+    <string name="slide_1_title">Willkommen zu Roadbook!</string>
     <string name="slide_1_desc"></string>
-    <string name="slide_2_title">Memorialize your trips</string>
+    <string name="slide_2_title">Speichern Sie unvergessliche Reisen mit unserer App!</string>
     <string name="slide_2_desc"></string>
-    <string name="slide_3_title">Start your trip!</string>
+    <string name="slide_3_title">Fangen wir gleich an!</string>
     <string name="slide_3_desc"></string>
     <string name="name">Name</string>
     <string name="save_trip">save trip</string>

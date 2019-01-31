@@ -41,7 +41,7 @@ public class NewTripDialog extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_new_trip, null);
         builder.setView(view)
-                .setTitle("Creating a new Trip")
+                .setTitle("Neuen Trip erstellen")
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
