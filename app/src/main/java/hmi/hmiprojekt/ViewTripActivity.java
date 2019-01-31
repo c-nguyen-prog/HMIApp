@@ -1,6 +1,7 @@
 package hmi.hmiprojekt;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import java.util.List;
 import hmi.hmiprojekt.MemoryAccess.TripReader;
 import hmi.hmiprojekt.TripComponents.Trip;
 import hmi.hmiprojekt.TripComponents.Waypoint;
+
 
 public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -63,11 +65,13 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        int i = 0;
         //place all markers and draw lines between them
         for ( Waypoint waypoint : mTrip.getWaypoints() ) {
             //TODO getLatLng NPE when picture doesnt contain LatLng
             try {
-                mMap.addMarker(new MarkerOptions().position(waypoint.getLatLng()).title(waypoint.getName()));
+                mMap.setOnMarkerClickListener(this);
+                mMap.addMarker(new MarkerOptions().position(waypoint.getLatLng()).title(waypoint.getName()).snippet(Integer.toString(i++)));
             } catch (Exception e) {
                 setResult(Activity.RESULT_CANCELED);
                 finish();
@@ -121,10 +125,24 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        Intent intent = new Intent(this, ImageViewerActivity.class);
+
+        Waypoint clickedWaypoint = mTrip.getWaypoints().get(Integer.parseInt(marker.getSnippet()));
+
+        File pictureFile = clickedWaypoint.getImg();
+        intent.putExtra("picture", pictureFile);
+
+        String desc = clickedWaypoint.getDesc();
+        intent.putExtra("Description", desc);
+
+        String name = clickedWaypoint.getName();
+        intent.putExtra("Name", name);
+
+        startActivity(intent);
         //return true if custom behaviour was done
         // TODO Nico hier custom ImageView öffnen !!
         //return false for default behaviour
-        return false;
+        return true;
     }
 
     @Override

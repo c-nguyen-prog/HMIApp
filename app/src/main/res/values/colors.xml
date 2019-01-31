@@ -4,13 +4,13 @@
     <color name="colorPrimaryDark">#5D4037</color>
     <color name="colorAccent">#4CAF50</color>
 
-    <color name="linkColor">#0000ff</color>
+    <color name="linkColor">#0000FF</color>
     <color name="background_main">#FBE9E7</color>
 
     <!-- Screens background color-->
     <color name="bg_screen1">#226666</color>
     <color name="bg_screen2">#aa3939</color>
-    <color name="bg_screen3">#71266e</color>
+    <color name="bg_screen3">#71266E</color>
     <!-- dots inactive colors -->
     <color name="pager_dark_screen1">#153c3c</color>
     <color name="pager_dark_screen2">#632222</color>
@@ -29,4 +29,10 @@
         <item>@color/pager_dark_screen2</item>
         <item>@color/pager_dark_screen3</item>
     </array>
+
+    <color name="black_overlay">#D4000000</color>
+    <color name="white_overlay">#B2FFFFFF</color>
+    <color name="gray_overlay">#94000000</color>
+    <color name="light_gray_overlay">#4D000000</color>
+    <color name="light_white_overlay">#73FFFFFF</color>
 </resources>

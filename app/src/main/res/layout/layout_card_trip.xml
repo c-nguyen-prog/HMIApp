@@ -5,7 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
-    app:cardCornerRadius="2dp">
+    android:elevation="24dp"
+    android:visibility="visible"
+    app:cardBackgroundColor="@color/light_white_overlay"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="0dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:textColor="#000000"
+            android:textColor="@android:color/black"
             app:layout_constraintBottom_toTopOf="@+id/textView_trip_date"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -29,6 +33,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            android:textColor="@color/gray_overlay"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView_trip_name" />
