@@ -169,8 +169,9 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if( resultCode == RESULT_OK){
-            if( requestCode == REQUEST_TAKE_PICTURE){
+        if( requestCode == REQUEST_TAKE_PICTURE){
+
+            if( resultCode == RESULT_OK){
 
                 fragmentRecordWaypoint.setPicture(pathToPicture);
 
@@ -184,6 +185,10 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
                 findViewById(R.id.fabAddWaypoint).setVisibility(View.GONE);
                 menu.getItem(0).setVisible(false);
 
+            } else {
+                //noinspection ResultOfMethodCallIgnored
+                new File(pathToPicture).delete();
+                getContentResolver().delete(pictureUri, null, null);
             }
         }
 

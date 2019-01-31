@@ -65,7 +65,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
         //place all markers and draw lines between them
         for ( Waypoint waypoint : mTrip.getWaypoints() ) {
-            //TODO getLatLng NPE when picture doesnt contain LatLng
+
             try {
                 mMap.addMarker(new MarkerOptions().position(waypoint.getLatLng()).title(waypoint.getName()));
             } catch (Exception e) {
