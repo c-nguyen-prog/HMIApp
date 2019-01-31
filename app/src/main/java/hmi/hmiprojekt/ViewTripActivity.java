@@ -128,16 +128,8 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
     public boolean onMarkerClick(Marker marker) {
         Intent intent = new Intent(this, ImageViewerActivity.class);
 
-        Waypoint clickedWaypoint = mTrip.getWaypoints().get(Integer.parseInt(marker.getSnippet()));
-
-        File pictureFile = clickedWaypoint.getImg();
-        intent.putExtra("picture", pictureFile);
-
-        String desc = clickedWaypoint.getDesc();
-        intent.putExtra("Description", desc);
-
-        String name = clickedWaypoint.getName();
-        intent.putExtra("Name", name);
+        intent.putExtra("tripDir", mTrip.getDir());
+        intent.putExtra("waypointIndex", Integer.parseInt(marker.getSnippet()));
 
         startActivity(intent);
         //return true if custom behaviour was done
