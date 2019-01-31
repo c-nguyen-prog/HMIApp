@@ -54,6 +54,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
             e.printStackTrace();
         }
 
+        setTitle(mTrip.getName());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
