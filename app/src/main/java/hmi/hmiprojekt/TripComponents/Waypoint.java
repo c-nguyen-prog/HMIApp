@@ -1,11 +1,15 @@
 package hmi.hmiprojekt.TripComponents;
 
 import android.support.annotation.NonNull;
+import android.support.media.ExifInterface;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.File;
 import java.util.Date;
+
+import hmi.hmiprojekt.MemoryAccess.TripWriter;
 
 public class Waypoint implements Comparable {
 
@@ -25,6 +29,18 @@ public class Waypoint implements Comparable {
         this.desc = desc;
         this.timestamp = timestamp;
         this.coordinates = coordinates;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+        ExifInterface exif;
+        try {
+            exif = new ExifInterface(img.getAbsolutePath());
+            exif.setAttribute(ExifInterface.TAG_USER_COMMENT, desc);
+            exif.saveAttributes();
+        } catch (Exception e) {
+            Log.e("EXIF", e.getLocalizedMessage());
+        }
     }
 
     // getters

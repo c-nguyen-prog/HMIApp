@@ -1,21 +1,36 @@
 package hmi.hmiprojekt;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.text.ParseException;
 
-public class ImageViewerActivity extends AppCompatActivity {
+import hmi.hmiprojekt.MemoryAccess.TripReader;
+import hmi.hmiprojekt.TripComponents.Trip;
+import hmi.hmiprojekt.TripComponents.Waypoint;
+
+public class ImageViewerActivity extends AppCompatActivity implements NewEditDescDialog.NewEditDescDialogListener {
+
+    private ImageView mImageView;
+    private TextView descView;
+    Waypoint currWaypoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,27 +42,76 @@ public class ImageViewerActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_image_viewer);
 
-        Intent intent = getIntent();
-        File imgFile = (File)getIntent().getExtras().get("picture");
 
-        String desc = intent.getStringExtra("Description");
-        TextView textView1 = findViewById(R.id.desc);
-        textView1.setText(desc);
+        Trip currTrip = null;
+        try {
+            currTrip = TripReader.readTrip((File)getIntent().getExtras().get("tripDir"));
+        } catch (ParseException e) {
+            Toast.makeText(getBaseContext()
+                    , "Das Bild ist beschädigt"
+                    , Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            finish();
+        }
+        int index = getIntent().getExtras().getInt("waypointIndex");
+        currWaypoint = currTrip.getWaypoints().get(index);
 
-        String name = intent.getStringExtra("Name");
-        TextView textView2 = findViewById(R.id.name);
-        textView2.setText(name);
+        descView = findViewById(R.id.desc);
+        descView.setText(currWaypoint.getDesc());
+
+        TextView name = findViewById(R.id.name);
+        name.setText(currWaypoint.getName());
 
         Bitmap myBitmap;
-        ImageView myImage;
 
-        if(imgFile.exists()) {
+        if(currWaypoint.getImg().exists()) {
 
-            myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            myImage = findViewById(R.id.imageView);
+            myBitmap = BitmapFactory.decodeFile(currWaypoint.getImg().getAbsolutePath());
+            mImageView = findViewById(R.id.imageView);
 
-            myImage.setImageBitmap(myBitmap);
+            mImageView.setImageBitmap(myBitmap);
+
+            int previousIndex = index-1;
+            int nextIndex = index+1;
+
+            final Trip finalTrip = currTrip;
+            final Context currContext = this;
+
+            mImageView.setOnTouchListener(new OnSwipeTouchListener(getBaseContext(), this) {
+               public void onSwipeTop() {
+                    //Toast.makeText(currContext, "top", Toast.LENGTH_SHORT).show();
+                }
+                public void onSwipeRight() {
+                    if (previousIndex < 0) return;
+                    viewOtherImage(previousIndex);
+                }
+                public void onSwipeLeft() {
+                    if (nextIndex >= finalTrip.getWaypoints().size()) return;
+                    viewOtherImage(nextIndex);
+                }
+                public void onSwipeBottom() {
+                    //Toast.makeText(currContext, "bottom", Toast.LENGTH_SHORT).show();
+                }
+                private void viewOtherImage(int index) {
+                    Intent intent = new Intent(currContext, ImageViewerActivity.class);
+                    intent.putExtra("tripDir", finalTrip.getDir());
+                    intent.putExtra("waypointIndex", index);
+                    finish();
+                    startActivity(intent);
+                }
+
+            });
         }
+
+
+        ImageButton editButton = findViewById(R.id.imageButton);
+        editButton.setOnClickListener(view -> showNewEditDescDialog());
+    }
+
+    private void showNewEditDescDialog() {
+        NewEditDescDialog dialog = new NewEditDescDialog();
+        dialog.setTitle(currWaypoint.getDesc());
+        dialog.show(getSupportFragmentManager(), currWaypoint.getDesc());
     }
 
     public void hide(View view) {
@@ -78,5 +142,13 @@ public class ImageViewerActivity extends AppCompatActivity {
             imgBtn.setVisibility(View.INVISIBLE);
         else
             imgBtn.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void returnDesc(String desc) {
+        if (desc != null) {
+            currWaypoint.setDesc(desc);
+            descView.setText(desc);
+        }
     }
 }
