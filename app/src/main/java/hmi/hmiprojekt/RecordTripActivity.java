@@ -200,9 +200,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
         if(location != null){
             currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
-
             takePicture();
-
         } else {
             Toast.makeText(getBaseContext()
                 , "Position error pls try again"
@@ -222,31 +220,34 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Willst du den Trip speichern?")
-                .setPositiveButton("Speichern", (dialog, id) -> {
-                    setResult(RESULT_OK);
-                    finishAfterTransition();
-                })
-                .setNegativeButton("Abbrechen", (dialog, id) -> dialog.cancel());
+                .setPositiveButton("Speichern", (dialog, id) -> saveTrip())
+                .setNegativeButton("Löschen", (dialog, id) -> deleteTrip());
         AlertDialog alert = builder.create();
         alert.show();
     }
 
     public void onSaveTrip(MenuItem item) {
+        saveTrip();
+    }
+
+    private void saveTrip(){
         if(!hasWaypoint) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Ein Trip kann ohne Bilder nicht gespeichert werden.")
-                    .setPositiveButton("Löschen", (dialog, id) -> {
-                        TripWriter.deleteTrip(mTrip);
-                        setResult(RESULT_OK);
-                        finishAfterTransition();
-                    })
-                    .setNegativeButton("Abbrechen", (dialog, id) -> dialog.cancel());
+                    .setNegativeButton("Löschen", (dialog, id) -> deleteTrip())
+                    .setPositiveButton("Abbrechen", (dialog, id) -> dialog.cancel());
             AlertDialog alert = builder.create();
             alert.show();
         } else {
             setResult(RESULT_OK);
             finishAfterTransition();
         }
+    }
+
+    private void deleteTrip(){
+        TripWriter.deleteTrip(mTrip);
+        setResult(RESULT_OK);
+        finishAfterTransition();
     }
 
     @Override
