@@ -396,16 +396,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId()==R.id.newTrip){
-            showNewTripDialog();
-        }
-
-        if (item.getItemId()==R.id.receiveTrip){
-            receiveTrip();
-        }
-        return super.onOptionsItemSelected(item);
+    public void onReceiveTrip(MenuItem item) {
+        receiveTrip();
     }
+
 }
