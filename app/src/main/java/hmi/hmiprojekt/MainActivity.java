@@ -13,7 +13,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +27,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 import android.widget.RelativeLayout;
-import android.widget.Toolbar;
 
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
@@ -78,10 +76,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+        Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         getSupportActionBar().hide();
         locationHelper = new LocationHelper(this);
         setContentView(R.layout.activity_main);
@@ -224,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                 break;
             case REQUEST_VIEW_TRIP:
                 if(resultCode == Activity.RESULT_CANCELED) {
-                    //TODO move FAB up when Snackbar shows
                     Snackbar.make(findViewById(R.id.activity_main), "Der ausgewählte Trip scheint beschädigt zu sein", Snackbar.LENGTH_LONG).show();
                 }
                 break;
