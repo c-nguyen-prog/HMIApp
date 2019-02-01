@@ -1,9 +1,11 @@
 package hmi.hmiprojekt.Connection;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -158,8 +160,22 @@ public class NearbyConnect {
                             Date todayDate = Calendar.getInstance().getTime();
                             DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
                             String dirName = dateFormat.format(todayDate) + "_SharedTrip";
-                            Zipper.unzip(lastFilePath, new File(Environment.getExternalStorageDirectory() + "/roadbook/" + dirName));
-                        } catch (IOException e) {
+                            Thread thread = new Thread(){
+                                @Override
+                                public void run(){
+                                    try {
+                                        Zipper.unzip(lastFilePath, new File(Environment.getExternalStorageDirectory() + "/roadbook/" + dirName));
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
+                                                .setTitle("Erfolg!");
+                                        builder.create();
+                                    } catch (Exception e){
+                                        Log.d("ThreadZipError", "failed");
+                                    }
+                                }
+                            };
+                            thread.start();
+                        } catch (Exception e) {
                             Log.e("ZIP", e.getMessage());
                         }
                     }
@@ -169,11 +185,6 @@ public class NearbyConnect {
                 public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
                     if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                         connectionsClient.disconnectFromEndpoint(endpointId);
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
-                                .setTitle("Erfolg!");
-                        builder.create();
-
                     }
                 }
             };

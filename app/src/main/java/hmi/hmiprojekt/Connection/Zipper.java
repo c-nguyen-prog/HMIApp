@@ -38,7 +38,7 @@ public class Zipper {
             }
             zos.close();
         } catch (IOException ioe) {
-            Log.e("", ioe.getMessage());
+            Log.e("zip", ioe.getMessage());
         }
     }
     public static void unzip(File zipFile, File targetDirectory) throws IOException {
