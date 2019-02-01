@@ -131,6 +131,8 @@ public class FragmentRecordWaypoint extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        ((AppCompatActivity) getActivity()).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().show();
         listener = null;
     }
 
