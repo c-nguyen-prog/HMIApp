@@ -22,6 +22,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -392,14 +393,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         return super.onContextItemSelected(item);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.main_menu,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    public void onReceiveTrip(MenuItem item) {
+    public void onReceiveTrip(View v) {
         receiveTrip();
     }
 
