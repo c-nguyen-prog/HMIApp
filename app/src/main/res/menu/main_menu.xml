@@ -5,8 +5,7 @@
     <item
         android:id="@+id/receiveTrip"
         android:icon="@drawable/ic_file_download_white_24dp"
-        app:showAsAction="always"
         android:onClick="onReceiveTrip"
         android:title="@string/receive_trip"
-        />
+        app:showAsAction="always" />
 </menu>

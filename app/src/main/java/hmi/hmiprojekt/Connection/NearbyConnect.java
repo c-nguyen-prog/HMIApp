@@ -63,7 +63,7 @@ public class NearbyConnect {
                 .addOnSuccessListener(
                         (Void unused) -> {
                             // We're advertising!
-                            Toast.makeText(context,"Searching for a companion",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context,"Suche nach einem Austauschpartner",Toast.LENGTH_SHORT).show();
 
                         })
                 .addOnFailureListener(
@@ -91,7 +91,7 @@ public class NearbyConnect {
                     // An endpoint was found. We request a connection to it.
                     connectionsClient.stopDiscovery();
                     connectionsClient.stopAdvertising();
-                    Toast.makeText(context,"Companion found",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Partner gefunden",Toast.LENGTH_SHORT).show();
 
                     connectionsClient.requestConnection(codeName, endpointId, connectionLifecycleCallback)
                             .addOnSuccessListener(
@@ -151,7 +151,7 @@ public class NearbyConnect {
             new PayloadCallback() {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
-                    Toast.makeText(context,"File received",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Datei empfangen",Toast.LENGTH_SHORT).show();
                     File lastFilePath = getLatestFilefromDir(Environment.getExternalStorageDirectory() + "/Download/Nearby");
                     if (lastFilePath != null) {
                         try {
@@ -170,8 +170,8 @@ public class NearbyConnect {
                     if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                         connectionsClient.disconnectFromEndpoint(endpointId);
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setMessage("The trip is saved on your Device. You can disable Wifi and Bluetooth if you want.")
-                                .setTitle("Success!");
+                        builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
+                                .setTitle("Erfolg!");
                         builder.create();
 
                     }

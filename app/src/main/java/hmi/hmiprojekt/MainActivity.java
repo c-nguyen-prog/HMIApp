@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             if (Config.createTripFolder()) {initRecycler(); return;}
             e.printStackTrace();
             Toast.makeText(getBaseContext()
-                    , "Unable to access your data"
+                    , "Nich möglich auf die Daten zuzugreifen"
                     , Toast.LENGTH_SHORT).show();
         }
 
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
-                        Toast.makeText(MainActivity.this, "Cannot start trip without location", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Trip kann ohne aktuellen Standort nicht aufgezeichnet werden", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
@@ -299,22 +299,22 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     private void sendTrip(Trip trip){
         if(bluetoothAdapter==null){
-            Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
             connectionsClient = new NearbyConnect(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"),
                     Nearby.getConnectionsClient(this), getApplicationContext());
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
-                Toast.makeText(getApplicationContext(),"Bluetooth enabled",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Bluetooth aktiviert",Toast.LENGTH_SHORT).show();
             }
             try {
                 if (!wifiManager.isWifiEnabled()) {
                     setWifi();
-                    Toast.makeText(getApplicationContext(),"Wifi enabled",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Wifi aktiviert",Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e){
-                Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Wifi nicht verfügbar",Toast.LENGTH_SHORT).show();
             }
             Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip.zip");
             connectionsClient.start();
@@ -323,21 +323,21 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     private void receiveTrip(){
         if(bluetoothAdapter==null){
-            Toast.makeText(getApplicationContext(),"Bluetooth not available",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
             connectionsClient = new NearbyConnect(null, Nearby.getConnectionsClient(this), getApplicationContext());
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
-                Toast.makeText(getApplicationContext(),"Bluetooth enabled",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Bluetooth aktiviert",Toast.LENGTH_SHORT).show();
             }
             try {
                 if (!wifiManager.isWifiEnabled()) {
                     setWifi();
-                    Toast.makeText(getApplicationContext(),"Wifi enabled",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Wifi aktiviert",Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception e){
-                Toast.makeText(getApplicationContext(),"Wifi not available",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Wifi nicht verfügbar",Toast.LENGTH_SHORT).show();
             }
             connectionsClient.start();
         }
