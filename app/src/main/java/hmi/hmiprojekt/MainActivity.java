@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
             ShowcaseView showcase = new ShowcaseView.Builder(this)
                     .setTarget(new ViewTarget(R.id.mainFab, this))
-                    .setContentTitle("SHOWCASE TUTORIAL")
-                    .setContentText("CLICK HERE TO START A TRIP")
+                    .setContentTitle("EINSTIEGS TUTORIAL")
+                    .setContentText("Hier klicken um einen neuen Trip aufzunehmen.")
                     .setStyle(R.style.CustomShowcaseTheme2)
                     .hideOnTouchOutside()
                     .build();

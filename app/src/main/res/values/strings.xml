@@ -4,7 +4,7 @@
     <string name="title_activity_maps">Map</string>
 
     <string name="next">WEITER</string>
-    <string name="skip">ÜBERSPRINGEN</string>
+    <string name="skip">\t\tÜBERSPRINGEN</string>
     <string name="start">Start!</string>
     <string name="slide_1_title">Willkommen zu Roadbook!</string>
     <string name="slide_1_desc"></string>
@@ -13,13 +13,13 @@
     <string name="slide_3_title">Fangen wir gleich an!</string>
     <string name="slide_3_desc"></string>
     <string name="name">Name</string>
-    <string name="save_trip">save trip</string>
+    <string name="save_trip">Trip speichern</string>
     <string name="speichern">speichern</string>
     <string name="beschreibung">Beschreibung</string>
     <string name="titel">Titel</string>
     <string name="verwerfen">verwerfen</string>
-    <string name="delete">delete</string>
-    <string name="send">send</string>
-    <string name="new_trip">New Trip</string>
-    <string name="receive_trip">Receive Trip</string>
+    <string name="delete">Löschen</string>
+    <string name="send">Senden</string>
+    <string name="new_trip">Neuer Trip</string>
+    <string name="receive_trip">Trip empfangen</string>
 </resources>
