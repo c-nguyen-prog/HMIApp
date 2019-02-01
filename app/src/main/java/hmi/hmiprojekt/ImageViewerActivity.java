@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.support.design.widget.Snackbar;
+import android.support.media.ExifInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -67,6 +70,28 @@ public class ImageViewerActivity extends AppCompatActivity implements NewEditDes
         if(currWaypoint.getImg().exists()) {
 
             myBitmap = BitmapFactory.decodeFile(currWaypoint.getImg().getAbsolutePath());
+
+            // This rotates the picture to show it in the correct orientation
+            try {
+                ExifInterface exif = new ExifInterface(currWaypoint.getImg().getAbsolutePath());
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                Matrix matrix = new Matrix();
+                if (orientation == 6) {
+                    matrix.postRotate(90);
+                }
+                else if (orientation == 3) {
+                    matrix.postRotate(180);
+                }
+                else if (orientation == 8) {
+                    matrix.postRotate(270);
+                }
+                // rotating bitmap
+                myBitmap = Bitmap.createBitmap(myBitmap, 0, 0, myBitmap.getWidth(), myBitmap.getHeight(), matrix, true);
+            }
+            catch (Exception e) {
+                Log.e("BitMap Rotate Error: ", e.getMessage());
+            }
+
             mImageView = findViewById(R.id.imageView);
 
             mImageView.setImageBitmap(myBitmap);

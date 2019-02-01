@@ -57,7 +57,7 @@
         android:backgroundTint="@android:color/black"
         android:ems="10"
         android:hint="@string/beschreibung"
-        android:inputType="textMultiLine"
+        android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/btnSave"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
