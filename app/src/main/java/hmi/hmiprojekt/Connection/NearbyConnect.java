@@ -43,6 +43,10 @@ import java.util.Random;
 import hmi.hmiprojekt.MainActivity;
 import hmi.hmiprojekt.MemoryAccess.Config;
 
+/**
+ * @author Simon Zibat
+ * helped by Minh Chi Nguyen where specified
+ */
 public class NearbyConnect {
     private ConnectionsClient connectionsClient;
     private String codeName;
@@ -57,6 +61,9 @@ public class NearbyConnect {
         this.context = context;
     }
 
+    /**
+     * beginning of connection
+     */
     private void startAdvertisingHere() {
 
         AdvertisingOptions advertisingOptions =
@@ -74,6 +81,9 @@ public class NearbyConnect {
                         });
     }
 
+    /**
+     * beginning of connection
+     */
     private void startDiscoveryHere() {
         DiscoveryOptions discoveryOptions =
                 new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT).build();
@@ -86,6 +96,9 @@ public class NearbyConnect {
                         });
     }
 
+    /**
+     * if other side has been found come here, request connection automatically
+     */
     private final EndpointDiscoveryCallback endpointDiscoveryCallback =
             new EndpointDiscoveryCallback() {
                 @Override
@@ -110,6 +123,10 @@ public class NearbyConnect {
                 }
             };
 
+    /**
+     * after connection has been requested come here, accept automatically
+     * after establishing connection send/receive the file
+     */
     private final ConnectionLifecycleCallback connectionLifecycleCallback =
             new ConnectionLifecycleCallback() {
                 @Override
@@ -149,6 +166,10 @@ public class NearbyConnect {
                 }
             };
 
+    /**File has been received, unzip and move to app
+     *
+     * date and path of last file by Minh Chi Nguyen
+     */
     private final PayloadCallback payloadCallback =
             new PayloadCallback() {
                 @Override
@@ -164,7 +185,7 @@ public class NearbyConnect {
                                 @Override
                                 public void run(){
                                     try {
-                                        Zipper.unzip(lastFilePath, new File(Environment.getExternalStorageDirectory() + "/roadbook/" + dirName));
+                                        Zipper.unzip(lastFilePath.getAbsolutePath(), Environment.getExternalStorageDirectory() + "/roadbook/" + dirName);
                                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                         builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
                                                 .setTitle("Erfolg!");
@@ -189,6 +210,11 @@ public class NearbyConnect {
                 }
             };
 
+    /**
+     * @author Minh Chi Nguyen
+     * @param dirPath directory to search through
+     * @return the newest file in the directory
+     */
     private File getLatestFilefromDir(String dirPath){
         File dir = new File(dirPath);
         File[] files = dir.listFiles();

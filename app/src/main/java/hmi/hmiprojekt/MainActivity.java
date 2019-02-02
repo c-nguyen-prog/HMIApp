@@ -234,6 +234,12 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    /**
+     * @author whoever needed specified permission
+     * @param requestCode predefined integer to switch to cases
+     * @param permissions specified permission
+     * @param grantResults result of permission request
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -294,6 +300,11 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    /**
+     * @author Simon Zibat
+     * @param trip to send
+     * managing sending side of file transfer
+     */
     private void sendTrip(Trip trip){
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
@@ -318,6 +329,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    /**
+     * @author Simon Zibat
+     * managing receiving side of file transfer
+     */
     private void receiveTrip(){
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
@@ -340,6 +355,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    /**
+     * @author Simon Zibat
+     * enable/disable bluetooth
+     */
     public void setBluetoothAdapter(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -353,6 +372,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    /**
+     * @ author Simon Zibat
+     * enable/disable Wifi
+     */
     public void setWifi(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,

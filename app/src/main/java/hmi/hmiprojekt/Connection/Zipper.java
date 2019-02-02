@@ -1,21 +1,19 @@
 package hmi.hmiprojekt.Connection;
 
 import android.util.Log;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
-/** thanks to https://stackoverflow.com/questions/3382996/how-to-unzip-files-programmatically-in-android
- * and https://stackoverflow.com/questions/6683600/zip-compress-a-folder-full-of-files-on-android
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+/** @author Simon Zibat
+ * Zip/Unzip a file
+ * thanks to https://stackoverflow.com/questions/6683600/zip-compress-a-folder-full-of-files-on-android
  * */
+
 public class Zipper {
     public static void zip(String inputFolderPath, String outZipPath) {
         try {
@@ -41,30 +39,19 @@ public class Zipper {
             Log.e("zip", ioe.getMessage());
         }
     }
-    public static void unzip(File zipFile, File targetDirectory) throws IOException {
-        ZipInputStream zis = new ZipInputStream(
-                new BufferedInputStream(new FileInputStream(zipFile)));
-        ZipEntry ze;
-        int count;
-        byte[] buffer = new byte[8192];
-        while ((ze = zis.getNextEntry()) != null) {
-            File file = new File(targetDirectory, ze.getName());
-            File dir = ze.isDirectory() ? file : file.getParentFile();
-            if (!dir.isDirectory() && !dir.mkdirs())
-                throw new FileNotFoundException("Failed to ensure directory: " +
-                        dir.getAbsolutePath());
-            if (ze.isDirectory())
-                continue;
-            FileOutputStream fout = new FileOutputStream(file);
-            BufferedOutputStream bufout = new BufferedOutputStream(fout);
 
-            while ((count = zis.read(buffer)) != -1){
-                bufout.write(buffer, 0, count);
-            }
-            bufout.close();
-            zis.closeEntry();
-            fout.close();
+    public static void unzip(String zip, String targetUnzip){
+        try {
+            // Initiate ZipFile object with the path/name of the zip file.
+            ZipFile zipFile = new ZipFile(zip);
+
+            // Extracts all files to the path specified
+            zipFile.extractAll(targetUnzip);
+
+        } catch (ZipException e) {
+            e.printStackTrace();
         }
-        zis.close();
+
     }
 }
+
