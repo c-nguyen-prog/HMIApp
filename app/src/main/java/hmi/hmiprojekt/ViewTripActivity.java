@@ -31,7 +31,10 @@ import hmi.hmiprojekt.MemoryAccess.TripReader;
 import hmi.hmiprojekt.TripComponents.Trip;
 import hmi.hmiprojekt.TripComponents.Waypoint;
 
-
+/**
+ * @author Patrick Strobel
+ * Activity to view a recorded trip and provide a mean to view recorded pictures by clicking on marker
+ */
 public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
@@ -46,7 +49,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
 
         mQueue = Volley.newRequestQueue(this);
 
-        //get tripDir vom intent and read in Trip
+        //get tripDir from intent and read in Trip
         File tripDir = (File) getIntent().getSerializableExtra("tripDir");
         try {
             mTrip = TripReader.readTrip(tripDir);
@@ -62,6 +65,13 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * callback from google maps fragment
+     * loops through waypoints, sets marker and adds polylines between them
+     * adds identifier to marker
+     * catches corrupted files, ie. pictures without location information or trips without waypoints
+     * @param googleMap GoogleMap Instance
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -80,7 +90,7 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
             }
 
             if(previousWaypoint != null){
-                addPolyline(previousWaypoint.getLatLng(), waypoint.getLatLng());
+                drawPolyline(previousWaypoint.getLatLng(), waypoint.getLatLng());
             }
             previousWaypoint = waypoint;
         }
@@ -99,48 +109,52 @@ public class ViewTripActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-    private void addPolyline(LatLng origin, LatLng destination){
-        drawPolyline(
-                origin.latitude + "," + origin.longitude,
-                destination.latitude + "," + destination.longitude);
-    }
-
-    private void drawPolyline(String origin,String destination) {
+    /**
+     * draws polyline on google maps fragment using the Google Directions API
+     * @param origin origin location as LatLng
+     * @param destination destination location as LatLng
+     */
+    private void drawPolyline(LatLng origin, LatLng destination) {
 
         String urlHead = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+        String ori = origin.latitude + "," + origin.longitude;
+        String dest = destination.latitude + "," + destination.longitude;
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, urlHead + origin + "&destination=" + destination + "&mode=walking" + "&key=" + getString(R.string.google_maps_key), null, response -> {
-            try {
-                // retrieve necessary information from the provided JSON
-                String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
-
-                List<LatLng> decodedPath = PolyUtil.decode(points);
-                mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, Throwable::printStackTrace);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, urlHead + ori + "&destination=" + dest + "&mode=walking" + "&key=" + getString(R.string.google_maps_key), null,
+                response -> {
+                    try {
+                        // retrieve necessary information from the provided JSON and add it to map
+                        String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+                        List<LatLng> decodedPath = PolyUtil.decode(points);
+                        mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }, Throwable::printStackTrace);
 
         mQueue.add(request);
+
     }
 
+    /**
+     * Takes the identifier of the marker and
+     * the directory of the current trip and starts the ImageViewerActivity
+     * @param marker marker which was clicked on by user
+     * @return value true because custom behaviour was performed
+     */
     @Override
     public boolean onMarkerClick(Marker marker) {
         Intent intent = new Intent(this, ImageViewerActivity.class);
-
         intent.putExtra("tripDir", mTrip.getDir());
         intent.putExtra("waypointIndex", Integer.parseInt(marker.getSnippet()));
-
         startActivity(intent);
-        //return true if custom behaviour was done
-        // TODO Nico hier custom ImageView öffnen !!
-        //return false for default behaviour
         return true;
     }
 
     @Override
     public void onBackPressed() {
         setResult(Activity.RESULT_OK);
+        finish();
         super.onBackPressed();
     }
 }

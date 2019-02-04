@@ -19,7 +19,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import hmi.hmiprojekt.R;
 
-public class    LocationHelper {
+/**
+ * @author Patrick Strobel
+ * Helper Class to provide the last known location
+ * based on exsisting code from prior projects
+ */
+public class LocationHelper {
 
     private final static int PERMISSION_REQUEST_LOCATION = 200;
     private FusedLocationProviderClient mFusedLocationClient;

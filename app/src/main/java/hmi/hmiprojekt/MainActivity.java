@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Window w = getWindow();
+        //TODO uncommenting this will render app hardly usable on devices with navigation bar
         //w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         getSupportActionBar().hide();
         locationHelper = new LocationHelper(this);
@@ -159,6 +160,11 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         registerForContextMenu(mainRecycler);
     }
 
+    /**
+     * @author Patrick Strobel
+     * Starts Trip by asking a location request
+     * result gets handled onSuccess()
+     */
     private void startTrip() {
         locationHelper.startLocationRequest(this);
     }
@@ -168,6 +174,12 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         tripDialog.show(getSupportFragmentManager(), "new trip dialog");
     }
 
+    /**
+     * @author Patrick Strobel
+     * this methods checks if the locations settings are enabled to start a trip
+     * the user gets asked by a familiar dialog to activate them first
+     * result gets handled in onActivityResult()
+     */
     protected void checkLocationSetting() {
 
         LocationSettingsRequest settingsRequest = new LocationSettingsRequest.Builder()
@@ -198,6 +210,13 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         });
     }
 
+    /**
+     * @author Patrick Strobel
+     * Activitys report back and user gets informed in case of irregularities
+     * @param requestCode predefined integer to switch to cases
+     * @param resultCode resultCode given by Activity
+     * @param data additional extra data passed down from called Activity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -205,11 +224,12 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
+                        //
                         startTrip();
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
-                        Toast.makeText(MainActivity.this, "Trip kann ohne aktuellen Standort nicht aufgezeichnet werden", Toast.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.activity_main), "Trip kann ohne aktuellen Standort nicht aufgezeichnet werden", Snackbar.LENGTH_LONG).show();
                         break;
                     default:
                         break;
@@ -275,11 +295,16 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         }
     }
 
+    /**
+     * @author Patrick Strobel
+     * LocationHelper calls this method when it retrieves a location
+     * starts RecordTrip Activity by passing the trip title and the current Position
+     * @param location current Location of device
+     */
     @Override
     public void onSuccess(Location location) {
 
         if (location != null) {
-
             Intent intent = new Intent(MainActivity.this, RecordTripActivity.class);
             intent.putExtra("currentPosition", new LatLng( location.getLatitude(), location.getLongitude()));
             intent.putExtra("tripName", tripName);

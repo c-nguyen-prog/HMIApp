@@ -27,6 +27,11 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
+/**
+ * @author Patrick Strobel
+ * Fragment to view the recorded picture and give the user the ability to add title and describtion to it
+ * aswell as the option to save or delete the waypoint
+ */
 public class FragmentRecordWaypoint extends Fragment {
 
     private FragmentListener listener;
@@ -34,11 +39,21 @@ public class FragmentRecordWaypoint extends Fragment {
     private EditText editName;
     private EditText editDesc;
 
+    /**
+     * Listener to communication with host Activity
+     */
     public interface FragmentListener {
         void onSaveWaypointListener(String name, String desc);
         void onDeleteWaypointListener();
     }
 
+    /**
+     * Creates View and adjust the picture the user has taken to display it inside the app
+     * @param inflater inflater
+     * @param container container
+     * @param savedInstanceState saved state
+     * @return View of Fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -76,7 +91,6 @@ public class FragmentRecordWaypoint extends Fragment {
 
 
         // This scales the picture to fit the imageView while maintaining the right aspect ratio
-
         int maxSize = getMaxTextureSize();
         if(bitmap.getWidth() > maxSize || bitmap.getHeight() > maxSize ){
             Log.e("SCALE: ", "Image was scaled");
@@ -113,6 +127,10 @@ public class FragmentRecordWaypoint extends Fragment {
         this.pathToPicture = pathToPicture;
     }
 
+    /**
+     * this method checks if the host Activity implements the necessary Listeners
+     * @param context Activity context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -128,6 +146,9 @@ public class FragmentRecordWaypoint extends Fragment {
         }
     }
 
+    /**
+     * onDetach the listener gets reset and Fragment is ready for reuse
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -136,6 +157,10 @@ public class FragmentRecordWaypoint extends Fragment {
         listener = null;
     }
 
+    /**
+     * Checks the maxTextureSize of the device the app is used on
+     * @return int largest texture size found or default
+     */
     //https://stackoverflow.com/questions/15313807/android-maximum-allowed-width-height-of-bitmap
     public static int getMaxTextureSize() {
         // Safe minimum default size

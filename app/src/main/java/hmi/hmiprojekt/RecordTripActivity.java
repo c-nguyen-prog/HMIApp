@@ -46,6 +46,10 @@ import hmi.hmiprojekt.Location.LocationHelper;
 import hmi.hmiprojekt.MemoryAccess.TripWriter;
 import hmi.hmiprojekt.TripComponents.Trip;
 
+/**
+ * @author Patrick Strobel
+ * Activity to record a trip
+ */
 public class RecordTripActivity extends AppCompatActivity implements OnMapReadyCallback, OnSuccessListener<Location>, FragmentRecordWaypoint.FragmentListener {
 
     private static final int REQUEST_TAKE_PICTURE = 100;
@@ -93,6 +97,11 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * callback from google maps fragment
+     * move camera to start position
+     * @param googleMap GoogleMap Instance
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -101,39 +110,41 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(currentPosition).zoom(15f).build()));
     }
 
-    private void addPolyline(){
-        if(lastPosition != null){
-            drawPolyline(
-                    lastPosition.latitude + "," + lastPosition.longitude,
-                    currentPosition.latitude + "," + currentPosition.longitude);
+    /**
+     * draws polyline on google maps fragment for which it uses the last waypoint position and the current position
+     * Uses the Google Directions API to determine the fastest path for a walking user
+     */
+    private void drawPolyline() {
+        if(lastPosition != null) {
+            String urlHead = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+            String origin = lastPosition.latitude + "," + lastPosition.longitude;
+            String destination = currentPosition.latitude + "," + currentPosition.longitude;
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                    urlHead + origin + "&destination=" + destination + "&mode=walking"
+                            + "&key=" + getString(R.string.google_maps_key), null,
+                    response -> {
+                        try {
+                            // retrieve necessary information from the provided JSON
+                            String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
+
+                            List<LatLng> decodedPath = PolyUtil.decode(points);
+                            mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }, Throwable::printStackTrace);
+
+            mQueue.add(request);
         } else {
-            //don't draw polyline after first picture and remove initial start marker
-            startMarker.remove();
+        //don't draw polyline after first picture and remove initial start marker
+        startMarker.remove();
         }
     }
 
-    private void drawPolyline(String origin,String destination) {
-
-        String urlHead = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                urlHead + origin + "&destination=" + destination + "&mode=walking"
-                        + "&key=" + getString(R.string.google_maps_key), null,
-                response -> {
-            try {
-                // retrieve necessary information from the provided JSON
-                String points = response.getJSONArray("routes").getJSONObject(0).getJSONObject("overview_polyline").getString("points");
-
-                List<LatLng> decodedPath = PolyUtil.decode(points);
-                mMap.addPolyline(new PolylineOptions().addAll(decodedPath).color(ContextCompat.getColor(this, R.color.colorPrimary)));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, Throwable::printStackTrace);
-
-        mQueue.add(request);
-    }
-
+    /**
+     * creates new file location and starts Intent to take a picture
+     */
     private void takePicture(){
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePicture.resolveActivity(getPackageManager()) != null) {
@@ -142,7 +153,6 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
             if(pictureFile != null) {
                 pathToPicture = pictureFile.getAbsolutePath();
-
                 pictureUri = FileProvider.getUriForFile(this, "hmi.hmiprojekt.HMIApp.fileprovider", pictureFile);
                 takePicture.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri);
                 startActivityForResult(takePicture, REQUEST_TAKE_PICTURE);
@@ -151,6 +161,10 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+    /**
+     * creates file for picture
+     * @return created picture file
+     */
     private File createPictureFile() {
         @SuppressLint("SimpleDateFormat")
         String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -166,16 +180,25 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         return pictureFile;
     }
 
+    /**
+     * started Activitys report back and actions get performed
+     * in this case the method is only used to receive information back from the started camera intent
+     * if a picture was taken we proceed by starting the fragment
+     * otherwise we delete the previously created file
+     * @param requestCode predefined integer to switch to cases
+     * @param resultCode resultCode given by Activity
+     * @param data additional extra data passed down from called Activity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if( requestCode == REQUEST_TAKE_PICTURE){
 
+        if( requestCode == REQUEST_TAKE_PICTURE){
             if( resultCode == RESULT_OK){
 
                 fragmentRecordWaypoint.setPicture(pathToPicture);
 
-                //opens fragment
+                //opens fragment to view picture and perform additional actions
                 getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.fragment_record_waypoint_container, fragmentRecordWaypoint)
@@ -186,6 +209,7 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
                 menu.getItem(0).setVisible(false);
 
             } else {
+                //delete created File if taking a picture failed
                 //noinspection ResultOfMethodCallIgnored
                 new File(pathToPicture).delete();
                 getContentResolver().delete(pictureUri, null, null);
@@ -195,6 +219,10 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
 
     }
 
+    /**
+     * OnSuccess listener used by LocationHelper class
+     * @param location current location provided by LocationHelper
+     */
     @Override
     public void onSuccess(Location location) {
 
@@ -208,28 +236,9 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.save_trip_menu, menu);
-        this.menu = menu;
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Willst du den Trip speichern?")
-                .setPositiveButton("Speichern", (dialog, id) -> saveTrip())
-                .setNegativeButton("Löschen", (dialog, id) -> deleteTrip());
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    public void onSaveTrip(MenuItem item) {
-        saveTrip();
-    }
-
+    /**
+     * returns to MainActivity or informers user if requirements are not met
+     */
     private void saveTrip(){
         if(!hasWaypoint) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -244,12 +253,22 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+    /**
+     * deletes created trip and returns back to MainActivity
+     */
     private void deleteTrip(){
         TripWriter.deleteTrip(mTrip);
         setResult(RESULT_OK);
         finishAfterTransition();
     }
 
+    /**
+     * call back from Fragment which informs me that the user wants to safe the waypoint
+     * writes given information and location in EXIF data of the picture
+     * manipulates Map Fragment to show the new waypoint
+     * @param name given title for the waypoint
+     * @param desc given description for the waypoint
+     */
     @Override
     public void onSaveWaypointListener(String name, String desc) {
         ExifInterface exif;
@@ -265,10 +284,10 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
             Log.e("EXIF", e.getLocalizedMessage());
         }
 
-        // add marker and polyline when waypoint gets saved
+        // add marker and polyline to map
         mMap.addMarker(new MarkerOptions().position(currentPosition));
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(currentPosition).zoom(15f).build()));
-        addPolyline();
+        drawPolyline();
         lastPosition = currentPosition;
 
         // remove fragment
@@ -284,6 +303,10 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         hasWaypoint = true;
     }
 
+    /**
+     * call back from Fragment which informs me that the user wants to delete the current waypoint
+     * deletes unused File and switches out fragments
+     */
     @Override
     public void onDeleteWaypointListener() {
 
@@ -301,5 +324,30 @@ public class RecordTripActivity extends AppCompatActivity implements OnMapReadyC
         findViewById(R.id.fabAddWaypoint).setVisibility(View.VISIBLE);
         menu.getItem(0).setVisible(true);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.save_trip_menu, menu);
+        this.menu = menu;
+        return true;
+    }
+
+    public void onSaveTrip(MenuItem item) {
+        saveTrip();
+    }
+
+    /**
+     * perform custom actions on BackPress
+     */
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Willst du den Trip speichern?")
+                .setPositiveButton("Speichern", (dialog, id) -> saveTrip())
+                .setNegativeButton("Löschen", (dialog, id) -> deleteTrip());
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }
