@@ -1,17 +1,10 @@
 package hmi.hmiprojekt.Connection;
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Environment;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Toast;
-
-import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
@@ -25,23 +18,13 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Random;
-
-import hmi.hmiprojekt.MainActivity;
-import hmi.hmiprojekt.MemoryAccess.Config;
 
 /**
  * @author Simon Zibat
@@ -174,7 +157,7 @@ public class NearbyConnect {
             new PayloadCallback() {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
-                    Toast.makeText(context,"Datei empfangen",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Datei empfangen, entzippe",Toast.LENGTH_SHORT).show();
                     File lastFilePath = getLatestFilefromDir(Environment.getExternalStorageDirectory() + "/Download/Nearby");
                     if (lastFilePath != null) {
                         try {
