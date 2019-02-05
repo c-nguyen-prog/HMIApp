@@ -53,7 +53,7 @@ import hmi.hmiprojekt.Welcome.Application;
 import hmi.hmiprojekt.Welcome.Preference;
 
 public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>
-        , NewTripDialog.NewTripDialogListener {
+        , NewTripDialog.NewTripDialogListener , NearbyConnect.ConnectListener {
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private static final int REQUEST_VIEW_TRIP = 400;
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
             connectionsClient = new NearbyConnect(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"),
-                    Nearby.getConnectionsClient(this), getApplicationContext());
+                    Nearby.getConnectionsClient(this), this);
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
@@ -362,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
-            connectionsClient = new NearbyConnect(null, Nearby.getConnectionsClient(this), getApplicationContext());
+            connectionsClient = new NearbyConnect(null, Nearby.getConnectionsClient(this), this);
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
                 setBluetoothAdapter();
@@ -439,6 +439,20 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     public void onReceiveTrip(View v) {
         receiveTrip();
+    }
+
+    @Override
+    public void onTransferCompleted() {
+        Snackbar.make(findViewById(R.id.activity_main), "Trip wurde empfangen!", Snackbar.LENGTH_LONG).show();
+        runOnUiThread(this::initRecycler);
+    }
+
+    @Override
+    public void onZipperFailed() {
+        Snackbar.make(findViewById(R.id.activity_main), "Fehler im Unzip Thread", Snackbar.LENGTH_LONG).show();
+        // TODO DELETE CORRUPTED SHARED TRIP
+        // to show corrupted SharedTrip for debugging purpose
+        runOnUiThread(this::initRecycler);
     }
 
 }

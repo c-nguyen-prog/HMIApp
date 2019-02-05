@@ -18,6 +18,7 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
@@ -35,6 +36,17 @@ public class NearbyConnect {
     private String codeName;
     private File fileToSend;
     private Context context;
+    private ConnectListener listener;
+
+    /**
+     * @author Patrick Strobel
+     * interface to communicate with host activity which must implement all methods
+     * more listeners for specific events can be added
+     */
+    public interface ConnectListener {
+        void onTransferCompleted();
+        void onZipperFailed();
+    }
 
     public NearbyConnect(File fileToSend, ConnectionsClient connectionsClient, Context context){
         this.fileToSend = fileToSend;
@@ -42,6 +54,14 @@ public class NearbyConnect {
         Random r = new Random();
         codeName = Integer.toString(r.nextInt(1000 - 1));
         this.context = context;
+
+        // check if Activity implements ConnectListener
+        if(context instanceof ConnectListener){
+            listener = (ConnectListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " Must implement ConnectListener");
+        }
     }
 
     /**
@@ -173,8 +193,10 @@ public class NearbyConnect {
                                         builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
                                                 .setTitle("Erfolg!");
                                         builder.create();
+                                        listener.onTransferCompleted();
                                     } catch (Exception e){
                                         Log.d("ThreadZipError", "failed");
+                                        listener.onZipperFailed();
                                     }
                                 }
                             };
