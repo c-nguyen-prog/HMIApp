@@ -53,7 +53,7 @@ import hmi.hmiprojekt.Welcome.Application;
 import hmi.hmiprojekt.Welcome.Preference;
 
 public class MainActivity extends AppCompatActivity implements OnSuccessListener<Location>
-        , NewTripDialog.NewTripDialogListener , NearbyConnect.ConnectListener {
+        , NewTripDialog.NewTripDialogListener , NearbyConnect.ConnectListener, RenameTripDialog.RenameTripDialogListener {
 
     private static final int REQUEST_CHECK_SETTINGS = 100;
     private static final int REQUEST_VIEW_TRIP = 400;
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private final static int PERMISSION_ACCESS_WIFI_STATE = 600;
     private LocationHelper locationHelper;
     private String tripName;
+    private String tripToRename;
     private TripAdapter tripAdapter;
 
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -172,6 +173,11 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     private void showNewTripDialog() {
         NewTripDialog tripDialog = new NewTripDialog();
         tripDialog.show(getSupportFragmentManager(), "new trip dialog");
+    }
+
+    private void showRenameTripDialog(){
+        RenameTripDialog tripDialog = new RenameTripDialog();
+        tripDialog.show(getSupportFragmentManager(), "rename trip dialog");
     }
 
     /**
@@ -327,6 +333,25 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     /**
      * @author Simon Zibat
+     *
+     * Renames Trip to specified name
+     * @param tripName new Name
+     */
+    @Override
+    public void returnNewTripName (String tripName) {
+        if (tripName != null && tripName.length() >= 1 && tripToRename != null) {
+            File toRename = new File(tripToRename);
+            String old = tripToRename.split("_", 2)[0];
+            File newName = new File(old + "_" + tripName);
+            toRename.renameTo(newName);
+            initRecycler();
+        } else {
+            Snackbar.make(findViewById(R.id.activity_main), "Bitte geben sie einen Namen an.", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * @author Simon Zibat
      * @param trip to send
      * managing sending side of file transfer
      */
@@ -334,6 +359,9 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
+            if(connectionsClient!=null){
+                connectionsClient=null;
+            }
             connectionsClient = new NearbyConnect(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"),
                     Nearby.getConnectionsClient(this), this);
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -362,6 +390,9 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
+            if(connectionsClient!=null){
+                connectionsClient=null;
+            }
             connectionsClient = new NearbyConnect(null, Nearby.getConnectionsClient(this), this);
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
@@ -432,6 +463,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             case R.id.delete:
                 TripWriter.deleteTrip(trip);
                 initRecycler();
+                break;
+            case R.id.rename:
+                tripToRename = trip.getDir().getAbsolutePath();
+                showRenameTripDialog();
                 break;
         }
         return super.onContextItemSelected(item);

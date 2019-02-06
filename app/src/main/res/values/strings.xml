@@ -22,4 +22,5 @@
     <string name="send">Senden</string>
     <string name="new_trip">Neuer Trip</string>
     <string name="receive_trip">Trip empfangen</string>
+    <string name="umbenennen">Umbenennen</string>
 </resources>
