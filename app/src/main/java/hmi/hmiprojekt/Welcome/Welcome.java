@@ -21,6 +21,12 @@ import android.widget.TextView;
 import hmi.hmiprojekt.MainActivity;
 import hmi.hmiprojekt.R;
 
+/**
+ * @author Chi Nguyen
+ * This class contains the welcoming slides.
+ * It checks if the user open the app first time, and shows the slides or jumps
+ * directly to the Main Activity
+ */
 public class Welcome extends AppCompatActivity {
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
@@ -124,11 +130,24 @@ public class Welcome extends AppCompatActivity {
         }
     }
 
+    /**
+     * Class for PagerAdapter to inflate the layout onto the view
+     */
     public class MyViewPagerAdapter extends PagerAdapter {
         private LayoutInflater layoutInflater;
+
+        /**
+         * Sole constructor
+         */
         public MyViewPagerAdapter() {
         }
 
+        /**
+         * This method instantiate the items in the slides
+         * @param container view container
+         * @param position position in view
+         * @return the inflated view
+         */
         public Object instantiateItem(ViewGroup container, int position) {
             layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(layouts[position], container, false);
@@ -136,12 +155,30 @@ public class Welcome extends AppCompatActivity {
             return view;
         }
 
+        /**
+         * Getter for the length of the layouts (slides)
+         * @return length of the layouts
+         */
         public int getCount() {
             return layouts.length;
         }
+
+        /**
+         * This method checks if the view is from the object
+         * @param view view to be checked
+         * @param obj object
+         * @return true if view is the object, otherwise false
+         */
         public boolean isViewFromObject(View view, Object obj) {
             return view == obj;
         }
+
+        /**
+         * This method remove the view from the container
+         * @param container view container
+         * @param position position in view
+         * @param object view object to be destroyed
+         */
         public void destroyItem(ViewGroup container, int position, Object object) {
             View view = (View) object;
             container.removeView(view);

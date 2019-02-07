@@ -114,6 +114,11 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
         lps.setMargins(margin, margin, margin, margin);
 
+        /**
+         * @author Chi Nguyen
+         * This function checks for when MainActivity is first started so it can show the
+         * walkthrough tutorials
+         */
         if (preference.isMAFirstTimeLaunch()) {
             preference.setMAFirstTimeLaunch(false);
             Log.e("Preference SET", Boolean.toString(preference.isMAFirstTimeLaunch()));
