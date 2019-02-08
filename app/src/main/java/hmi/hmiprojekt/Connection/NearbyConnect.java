@@ -1,6 +1,5 @@
 package hmi.hmiprojekt.Connection;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -198,13 +197,9 @@ public class NearbyConnect {
                                     public void run(){
                                         try {
                                             Zipper.unzip(lastFilePath.getAbsolutePath(), Environment.getExternalStorageDirectory() + "/roadbook/" + dirName);
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                            builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
-                                                    .setTitle("Erfolg!");
-                                            builder.create();
                                             listener.onTransferCompleted();
                                         } catch (Exception e){
-                                            Log.d("ThreadZipError", "failed");
+                                            Log.d("ThreadZipError",  e.getMessage());
                                             listener.onZipperFailed();
                                         }
                                     }
