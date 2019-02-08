@@ -364,9 +364,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
-            if(connectionsClient!=null){
-                connectionsClient=null;
-            }
+            Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip.zip");
             connectionsClient = new NearbyConnect(new File(Environment.getExternalStorageDirectory() + "/roadbook/zip.zip"),
                     Nearby.getConnectionsClient(this), this);
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -382,8 +380,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi nicht verfügbar",Toast.LENGTH_SHORT).show();
             }
-            Zipper.zip(trip.getDir().getAbsolutePath(),Environment.getExternalStorageDirectory() + "/roadbook/zip.zip");
-            connectionsClient.start();
+            connectionsClient.startAdvertising();
         }
     }
 
@@ -395,9 +392,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(bluetoothAdapter==null){
             Toast.makeText(getApplicationContext(),"Bluetooth nicht verfügbar",Toast.LENGTH_SHORT).show();
         } else {
-            if(connectionsClient!=null){
-                connectionsClient=null;
-            }
             connectionsClient = new NearbyConnect(null, Nearby.getConnectionsClient(this), this);
             WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!bluetoothAdapter.isEnabled()) {
@@ -412,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             } catch (Exception e){
                 Toast.makeText(getApplicationContext(),"Wifi nicht verfügbar",Toast.LENGTH_SHORT).show();
             }
-            connectionsClient.start();
+            connectionsClient.startDiscovering();
         }
     }
 

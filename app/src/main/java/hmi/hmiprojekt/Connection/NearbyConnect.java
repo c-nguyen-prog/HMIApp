@@ -75,7 +75,7 @@ public class NearbyConnect {
                 .addOnSuccessListener(
                         (Void unused) -> {
                             // We're advertising!
-                            Toast.makeText(context,"Suche nach einem Austauschpartner",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context,"Melde als Austauschpartner",Toast.LENGTH_SHORT).show();
 
                         })
                 .addOnFailureListener(
@@ -93,9 +93,11 @@ public class NearbyConnect {
         connectionsClient.startDiscovery("hmi.hmiprojekt", endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
+                            Toast.makeText(context,"Suche nach einem Austauschpartner",Toast.LENGTH_SHORT).show();
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
+                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
     }
 
@@ -177,40 +179,41 @@ public class NearbyConnect {
             new PayloadCallback() {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
-                    Toast.makeText(context,"Datei empfangen, entzippe",Toast.LENGTH_SHORT).show();
-                    File lastFilePath = getLatestFilefromDir(Environment.getExternalStorageDirectory() + "/Download/Nearby");
-                    if (lastFilePath != null) {
-                        try {
-                            Date todayDate = Calendar.getInstance().getTime();
-                            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-                            String dirName = dateFormat.format(todayDate) + "_SharedTrip";
-                            Thread thread = new Thread(){
-                                @Override
-                                public void run(){
-                                    try {
-                                        Zipper.unzip(lastFilePath.getAbsolutePath(), Environment.getExternalStorageDirectory() + "/roadbook/" + dirName);
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                        builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
-                                                .setTitle("Erfolg!");
-                                        builder.create();
-                                        listener.onTransferCompleted();
-                                    } catch (Exception e){
-                                        Log.d("ThreadZipError", "failed");
-                                        listener.onZipperFailed();
-                                    }
-                                }
-                            };
-                            thread.start();
-                        } catch (Exception e) {
-                            Log.e("ZIP", e.getMessage());
-                        }
-                    }
+
                 }
 
                 @Override
                 public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
                     if (update.getStatus() == PayloadTransferUpdate.Status.SUCCESS) {
                         connectionsClient.disconnectFromEndpoint(endpointId);
+                        Toast.makeText(context,"Datei empfangen, entzippe",Toast.LENGTH_SHORT).show();
+                        File lastFilePath = getLatestFilefromDir(Environment.getExternalStorageDirectory() + "/Download/Nearby");
+                        if (lastFilePath != null) {
+                            try {
+                                Date todayDate = Calendar.getInstance().getTime();
+                                DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                                String dirName = dateFormat.format(todayDate) + "_SharedTrip";
+                                Thread thread = new Thread(){
+                                    @Override
+                                    public void run(){
+                                        try {
+                                            Zipper.unzip(lastFilePath.getAbsolutePath(), Environment.getExternalStorageDirectory() + "/roadbook/" + dirName);
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                            builder.setMessage("Der Trip wurde auf Ihrem Gerät gespeichert")
+                                                    .setTitle("Erfolg!");
+                                            builder.create();
+                                            listener.onTransferCompleted();
+                                        } catch (Exception e){
+                                            Log.d("ThreadZipError", "failed");
+                                            listener.onZipperFailed();
+                                        }
+                                    }
+                                };
+                                thread.start();
+                            } catch (Exception e) {
+                                Log.e("ZIP", e.getMessage());
+                            }
+                        }
                     }
                 }
             };
@@ -236,8 +239,11 @@ public class NearbyConnect {
         return lastModifiedFile;
     }
 
-    public void start(){
+    public void startAdvertising(){
         startAdvertisingHere();
+    }
+
+    public void startDiscovering(){
         startDiscoveryHere();
     }
 }
